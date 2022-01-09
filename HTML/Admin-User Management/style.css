@@ -1,0 +1,133 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+.row{
+    width: 95% !important;
+}
+
+/* Navbar */
+
+.navbar-brand{
+    font-size: 35px !important;
+}
+
+.menu{
+   margin-left: 1080px;
+}
+.menu .admin{
+    width: 36px;
+    height: 36px;
+}
+.menu .logout{
+    width: 25px;
+    height: 28px;
+    margin-top: 6px;
+}
+.menu .username{
+    width: 94px;
+    height: 19px;
+    font-size: 20px !important;
+    opacity: 1;
+    margin-top: 5px;    
+}
+.card{
+    width: 272px;
+    /* height: 1012px; */
+}
+.card .v-nav a{
+    border-bottom: 2px solid #E5E5E5 ;
+    width: 100%;
+    color: #646464 !important;
+    font-size: 18px;
+}
+.card .v-nav .active{
+    color: #1FB6FF !important;
+}
+.topic h2 {
+    margin-left: 60px;
+    margin-top: 30px;
+    color: #646464 !important;
+}
+.topic span{
+    margin-left: 700px;
+}
+.topic .box{
+    margin-left: 60px;
+    border:2px solid #E5E5E5;
+    width: 1115px;
+    height: 86px;
+}
+.topic .one{
+    margin-top: 20px;
+    margin-left: 15px;
+    width: 205px;
+    height: 46px;
+    text-align: center;
+}
+.topic .two{
+    margin-top: 20px;
+    margin-left: 15px;
+    width: 205px;
+    height: 46px;
+    text-align: center;
+}
+.topic .three{
+    margin-top: 20px;
+    margin-left: 15px;
+    width: 205px;
+    height: 46px;
+    text-align: center;
+}
+.topic .four{
+    margin-top: 20px;
+    margin-left: 15px;
+    width: 205px;
+    height: 46px;
+    text-align: center;
+}
+.topic button{
+    width: 84px;
+    height: 46px;
+    margin-left: 15px;
+    margin-top: -5px;
+}
+.topic table{
+    margin-left: 60px;
+    border:2px solid #E5E5E5;
+    width: 1115px;
+    margin-top: 20px;    
+}
+.topic .table .success{
+    background: rgb(36, 187, 36);;
+    width: 58px;
+    height: 24px;
+}
+.topic .table .fail{
+    background: rgb(238, 48, 80);
+    width: 58px;
+    height: 24px;
+}
+.topic .table .five{
+    width: 58px;
+    height: 40px;
+    text-align: center;
+}
+.topic .table .b0,
+.topic .table .b1,
+.topic .table .b2
+{
+    text-align: center;
+    width: 40px;
+    height: 40px;
+    border: 1px solid #D6D6D6;
+}
+.topic .table .b1{
+    
+    color: white !important;
+    background: #646464;
+}
+footer{
+    margin-left: 60px;
+    margin-top: 20px;
+}
