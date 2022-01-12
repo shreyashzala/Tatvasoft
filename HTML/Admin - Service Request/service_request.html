@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Service Request</title>
+
+    <link rel="stylesheet" href="css/service_request.css">
+
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+
+    <link rel="stylesheet" href="css/all.min.css">
+</head>
+<body>
+    
+ <div class="wrapper">
+    <nav class="navbar navbar-expand-lg navbar-light bg-primary">
+        <a class="navbar-brand text-light" href="#">helperland</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav menu">
+            <li class="nav-item">
+              <a class="nav-link" href="#"><img src="image/admin-user.png" class="admin" alt="admin"></a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-light ml-2 mr-3 username" href="#">Username</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#"><img src="image/logout.png" class="logout" alt="logout"></a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+
+</div>    
+<!-- Vertical Nav & Table -->
+<div class="row">
+    <div class="col-md-2">
+      <div class="card">
+        <div class="card-text">
+            <nav class="nav flex-column v-nav">
+                <a class="nav-link" href="#">Service Management</a>
+                <a class="nav-link" href="#">Role Management</a>
+                <a class="nav-link" href="#id1" data-toggle="collapse">Coupan Code Management</a>
+                <div class="collapse" id="id1">
+                     <li>Coupan Code</li>
+                     <li>Usage History</li>
+                </div>
+                <a class="nav-link" href="#">Escalation Management</a>
+                <a class="nav-link active" href="#">Service Request</a>
+                <a class="nav-link" href="#">Service Provider</a>
+                <a class="nav-link" href="#">User Management</a>
+                <a class="nav-link" href="#id2" data-toggle="collapse">Finace Module</a>
+                    <div class="collapse" id="id2">
+                         <li>All Transactions </li>
+                         <li>Generate Payment</li>
+                         <li>Customer Invoices</li>
+                   </div>
+                <a class="nav-link" href="#">Zip Code Management</a>
+                <a class="nav-link" href="#">Rating Management</a>
+                <a class="nav-link" href="#">Inquiry Management</a>
+                <a class="nav-link" href="#">Newsletter Management</a>
+                <a class="nav-link" href="#id3" data-toggle="collapse">Content Management</a>
+                <div class="collapse" id="id3">
+                    <li>Blog</li>
+                    <li>FAQs</li>
+               </div>
+                
+              </nav>
+        </div>
+      </div>        
+    </div>
+    <div class="col-md-10 topic">
+        <h2>Service Request </h2>
+
+        <div class="box">
+          <form action="" method="post" class="d-inline"> 
+            <input type="text" class="one" placeholder="Service Id">
+            <input type="text" class="two" placeholder="Customer">
+            <input type="text" class="three" placeholder="Service Provider">
+            <input type="text" class="four" placeholder="Status">
+            <input type="date" class="five" placeholder="from date">
+            <input type="date" class="six" placeholder="to date">
+            <button class="btn btn-primary">Search</button>
+            <button class="btn btn-outline-primary">Clear</button>
+          </form>
+        </div>
+        <table class="table">
+          <thead>
+            <th>Service ID <img src="image/sort.png" alt="img"></th>
+            <th>Service Date <img src="image/sort.png" alt="img"></th>
+            <th>Customer Details <img src="image/sort.png" alt="img"></th>
+            <th>Service Provider <img src="image/sort.png" alt="img"></th>
+            <th>Status <img src="image/sort.png" alt="img"></th>
+            <th>Actions </th>
+          </thead>
+          <tbody>
+              <tr>
+                    <td>323436</td>
+                    <td><img src="image/calendar2.png" alt=""> 09/04/2018 <br>
+                        <img src="image/layer-712.png" alt=""> 12.00 - 18.00
+                    </td>
+                    <td>David Bough <br>
+                        <img src="image/layer-719.png" alt=""> Musterstrabe 5,12345 Bonn
+                    </td>
+                    <td>
+                        
+                    </td>
+                    <td><p class="new">New</p></td>
+                    <td class="text-center">:</td>
+              </tr>
+              <tr>
+                    <td>323436</td>
+                    <td><img src="image/calendar2.png" alt=""> 09/04/2018 <br>
+                        <img src="image/layer-712.png" alt=""> 12.00 - 18.00
+                    </td>
+                    <td>David Bough <br>
+                        <img src="image/layer-719.png" alt=""> Musterstrabe 5,12345 Bonn
+                    </td>
+                    <td>
+                        
+                    </td>
+                    <td><p class="new">New</p></td>
+                    <td class="text-center">:</td>
+              </tr>
+              <tr>
+                    <td>323436</td>
+                    <td><img src="image/calendar2.png" alt=""> 09/04/2018 <br>
+                        <img src="image/layer-712.png" alt=""> 12.00 - 18.00
+                    </td>
+                    <td>David Bough <br>
+                        <img src="image/layer-719.png" alt=""> Musterstrabe 5,12345 Bonn
+                    </td>
+                    <td>
+                        <img src="image/cap.png" alt="cap"> Lyum Watson
+                    </td>
+                    <td><p class="pending">Pending</p></td>
+                    <td class="text-center dropdown">
+                        <a href="#" data-toggle="dropdown">: </a>
+                        <div class="dropdown-menu">
+                            <a href="#" class="dropdown-item">Edit & Reschedule</a>
+                            <a href="#" class="dropdown-item">Refund</a>
+                            <a href="#" class="dropdown-item">Cancel</a>
+                            <a href="#" class="dropdown-item">Change SP</a>
+                            <a href="#" class="dropdown-item">Escalate</a>
+                            <a href="#" class="dropdown-item">History Log</a>
+                            <a href="#" class="dropdown-item">Download Invoices</a>
+                        </div>
+                    </td>
+              </tr>
+              <tr>
+                    <td>323436</td>
+                    <td><img src="image/calendar2.png" alt=""> 09/04/2018 <br>
+                        <img src="image/layer-712.png" alt=""> 12.00 - 18.00
+                    </td>
+                    <td>David Bough <br>
+                        <img src="image/layer-719.png" alt=""> Musterstrabe 5,12345 Bonn
+                    </td>
+                    <td>
+                        <img src="image/cap.png" alt="cap"> Lyum Watson
+                    </td>
+                    <td><p class="pending">Pending</p></td>
+                    <td class="text-center dropdown">
+                        <a href="#" data-toggle="dropdown">: </a>
+                        <div class="dropdown-menu">
+                            <a href="#" class="dropdown-item">Edit & Reschedule</a>
+                            <a href="#" class="dropdown-item">Refund</a>
+                            <a href="#" class="dropdown-item">Cancel</a>
+                            <a href="#" class="dropdown-item">Change SP</a>
+                            <a href="#" class="dropdown-item">Escalate</a>
+                            <a href="#" class="dropdown-item">History Log</a>
+                            <a href="#" class="dropdown-item">Download Invoices</a>
+                        </div>
+                    </td>
+              </tr>
+              <tr>
+                    <td>323436</td>
+                    <td><img src="image/calendar2.png" alt=""> 09/04/2018 <br>
+                        <img src="image/layer-712.png" alt=""> 12.00 - 18.00
+                    </td>
+                    <td>David Bough <br>
+                        <img src="image/layer-719.png" alt=""> Musterstrabe 5,12345 Bonn
+                    </td>
+                    <td>
+                        <img src="image/cap.png" alt="cap"> Lyum Watson
+                    </td>
+                    <td><p class="success">Completed</p></td>
+                    <td class="text-center dropdown">
+                        <a href="#" data-toggle="dropdown">: </a>
+                        <div class="dropdown-menu">
+                            <a href="#" class="dropdown-item">Refund</a>
+                            <a href="#" class="dropdown-item">Escalate</a>
+                            <a href="#" class="dropdown-item">History Log</a>
+                            <a href="#" class="dropdown-item">Download Invoices</a>
+                        </div>
+                    </td>
+              </tr>
+              <tr>
+                    <td>323436</td>
+                    <td><img src="image/calendar2.png" alt=""> 09/04/2018 <br>
+                        <img src="image/layer-712.png" alt=""> 12.00 - 18.00
+                    </td>
+                    <td>David Bough <br>
+                        <img src="image/layer-719.png" alt=""> Musterstrabe 5,12345 Bonn
+                    </td>
+                    <td>
+                        <img src="image/cap.png" alt="cap"> Lyum Watson
+                    </td>
+                    <td><p class="success">Completed</p></td>
+                    <td class="text-center dropdown">
+                        <a href="#" data-toggle="dropdown">: </a>
+                        <div class="dropdown-menu">
+                            <a href="#" class="dropdown-item">Refund</a>
+                            <a href="#" class="dropdown-item">Escalate</a>
+                            <a href="#" class="dropdown-item">History Log</a>
+                            <a href="#" class="dropdown-item">Download Invoices</a>
+                        </div>
+                    </td>
+              </tr>
+              <tr>
+                    <td>323436</td>
+                    <td><img src="image/calendar2.png" alt=""> 09/04/2018 <br>
+                        <img src="image/layer-712.png" alt=""> 12.00 - 18.00
+                    </td>
+                    <td>David Bough <br>
+                        <img src="image/layer-719.png" alt=""> Musterstrabe 5,12345 Bonn
+                    </td>
+                    <td>
+                        <img src="image/cap.png" alt="cap"> Lyum Watson
+                    </td>
+                    <td><p class="fail">Cancelled</p></td>
+                    <td class="text-center">:</td>
+              </tr>
+              <tr>
+                    <td>323436</td>
+                    <td><img src="image/calendar2.png" alt=""> 09/04/2018 <br>
+                        <img src="image/layer-712.png" alt=""> 12.00 - 18.00
+                    </td>
+                    <td>David Bough <br>
+                        <img src="image/layer-719.png" alt=""> Musterstrabe 5,12345 Bonn
+                    </td>
+                    <td>
+                        <img src="image/cap.png" alt="cap"> Lyum Watson
+                    </td>
+                    <td><p class="success">Completed</p></td>
+                    <td class="text-center dropdown">
+                        <a href="#" data-toggle="dropdown">: </a>
+                        <div class="dropdown-menu">
+                            <a href="#" class="dropdown-item">Refund</a>
+                            <a href="#" class="dropdown-item">Escalate</a>
+                            <a href="#" class="dropdown-item">History Log</a>
+                            <a href="#" class="dropdown-item">Download Invoices</a>
+                        </div>
+                    </td>
+              </tr>
+              <tr>
+                    <td>323436</td>
+                    <td><img src="image/calendar2.png" alt=""> 09/04/2018 <br>
+                        <img src="image/layer-712.png" alt=""> 12.00 - 18.00
+                    </td>
+                    <td>David Bough <br>
+                        <img src="image/layer-719.png" alt=""> Musterstrabe 5,12345 Bonn
+                    </td>
+                    <td>
+                        <img src="image/cap.png" alt="cap"> Lyum Watson
+                    </td>
+                    <td><p class="fail">Cancelled</p></td>
+                    <td class="text-center">:</td>
+              </tr>
+              <tr>
+                    <td>323436</td>
+                    <td><img src="image/calendar2.png" alt=""> 09/04/2018 <br>
+                        <img src="image/layer-712.png" alt=""> 12.00 - 18.00
+                    </td>
+                    <td>David Bough <br>
+                        <img src="image/layer-719.png" alt=""> Musterstrabe 5,12345 Bonn
+                    </td>
+                    <td>
+                        <img src="image/cap.png" alt="cap"> Lyum Watson
+                    </td>
+                    <td><p class="success">Completed</p></td>
+                    <td class="text-center dropdown">
+                        <a href="#" data-toggle="dropdown">: </a>
+                        <div class="dropdown-menu">
+                            <a href="#" class="dropdown-item">Refund</a>
+                            <a href="#" class="dropdown-item">Escalate</a>
+                            <a href="#" class="dropdown-item">History Log</a>
+                            <a href="#" class="dropdown-item">Download Invoices</a>
+                        </div>
+                    </td>
+              </tr>
+              <tr>
+                <td colspan="3">
+                  Show: <input type="text" class="five" placeholder="10">  Entries.
+                </td>
+                <td colspan="5">
+                  <input type="text" class="b0" placeholder="<">
+                  <input type="text" class="b1 text-light" placeholder="1">
+                  <input type="text" class="b2" placeholder="2">
+                  <input type="text" class="b2" placeholder="3">
+                  <input type="text" class="b2" placeholder="4">
+                  <input type="text" class="b2" placeholder="5">
+                  <input type="text" class="b0" placeholder=">">
+                </td>
+            </tr>
+          </tbody>
+        </table>
+        <footer>
+          <p>&copy;2018 helperland , All rights reserved.</p>
+        </footer>
+    </div>
+</div>
+      
+
+
+
+
+    <!-- js Files -->
+
+    <script src="js/jquery.min.js"></script>
+    <script src="js/poper.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/all.min.js"></script>
+</body>
+</html>
