@@ -13,11 +13,7 @@ class HelperlandController
         
         include("./Views/home.php");
     }
-    public function about()
-    {
-        
-        include("./Views/about.php");
-    }
+    
     public function ContactUs()
     {
         
