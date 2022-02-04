@@ -15,7 +15,7 @@
                     <span class="two"> <a href="about.php" class="text-light">ABOUT</a></span>   
                     <span class="two"><a href="#" class="text-light">TESTIMONIALS</a></span>  
                     <span class="two"><a href="faq.php" class="text-light">FAQS</a></span>
-                    <span class="two"><a href="#" class="text-light">Mail</a></span>
+                    <span class="two"><a href="#" class="text-light">INSURANCE POLICY</a></span>
                     <span class="two"><a href="#" class="text-light">IMPRESSUM</a></span>    
                 </span>
                 <div class="media-icons">
