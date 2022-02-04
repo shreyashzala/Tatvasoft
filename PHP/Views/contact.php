@@ -1,5 +1,7 @@
 <?php
   $base_url = "http://localhost/Helperland/";
+  session_start();
+  
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -19,7 +21,7 @@
 <body>
     
 <?php 
-   include('navbar.php'); 
+   include('includes/navbar.php'); 
 ?>
         <div class="banner">
             <img src="./assets/image/group-16_2.png" alt="prices">
@@ -62,17 +64,18 @@
         <div class="touch">
             <h1>Get In Touch with us</h1>
             <form method="post" autocomplete="off" action="http://localhost/Helperland/?controller=Helperland&function=ContactUs">
-                <input type="text" name="firstname" id="fname" placeholder="First Name">
-                <input type="text" name="lastname" id="lname" placeholder="Last Name"><br>
-                <input type="tel" name="mobile" id="mobile" placeholder="Mobile No">
-                <input type="email" name="email" id="email" placeholder="Email Address"><br>
-                <select name="sub">
+                <input type="text" name="firstname" id="fname" placeholder="First Name" required>
+                <input type="text" name="lastname" id="lname" placeholder="Last Name" required><br>
+                <input type="tel" name="mobile" id="mobile" placeholder="Mobile No" required>
+                <input type="email" name="email" id="email" placeholder="Email Address" required><br>
+                <select name="sub" required>
                     <option value="Select">Select</option>
                     <option value="Subscription">Subscription</option>
                     <option value="Feedback">Feedback</option>
                 </select><br>
-                <textarea name="message" id="txtlarge" cols="30" rows="10" placeholder="Message"></textarea><br>
-                <button class="submit">Submit<a href="#"></a></button>
+                <textarea name="message" id="txtlarge" cols="30" rows="10" placeholder="Message" required></textarea><br>
+                <button class="submit text-light">Submit</button>
+                <?php if(isset($_SESSION['message'])) { echo $_SESSION['message'];} ?>
             </form>
         </div>
 
@@ -85,5 +88,5 @@
         <!-- Footer -->
 
 <?php 
-   include('footer.php');
+   include('includes/footer.php');
 ?>
