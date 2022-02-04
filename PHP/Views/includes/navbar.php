@@ -12,7 +12,7 @@
                 </label>
                 <ul class="menu">
                     <li><button class="box"><a href="#" class="first">Book Now</a></button></li>
-                    <li><button class="box-two"><a href="http://localhost/Helperland/?controller=Helperland&function=about" class="two"> Prices & Services</a></button></li>
+                    <li><button class="box-two"><a href="prices.php" class="two"> Prices & Services</a></button></li>
                     <li><a href="#" class="three">Warranty</a></li>
                     <li><a href="#" class="three">Blog</a></li>
                     <li><a href="contact.php" class="three">Contact</a></li>
