@@ -1,3 +1,18 @@
+<?php
+  if(isset($_SESSION['name'])){
+    echo '<script>
+    alert("Invalid details");
+  </script>';
+  }
+  if(isset($_SESSION['msg'])){
+    echo '<script>
+    alert("Password Updated Please Relogin");
+   </script>';
+  }
+
+
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -37,6 +52,7 @@
       </div>
     </div>
     <div class="headbtn">
+      
       <a class="btn" href="#" role="button">Let’s Book a Cleaner</a>
     </div>
 
@@ -84,48 +100,9 @@
 
 
   </header>
-  <nav class="navbar navbar-expand-lg fixed-top navbar-light">
-    <a class="navbar-brand" href="#"><img src="./assets/image/white-logo-transparent-background.png"></a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown"
-      aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"><i class="fa fa-bars"></i></span>
-    </button>
-    <div class="collapse navbar-collapse float-right" id="navbarNavDropdown">
-      <ul class="navbar-nav ">
-        <li class="nav-item link1">
-          <a class="nav-link box-5" id="box-1" href="#">Book a Cleaner </a>
-          <a class="nav-link box-5" href="prices.php">Prices</a>
-          <a class="nav-link box-5" href="#">Our Guaruntee</a>
-          <a class="nav-link box-5" href="#">Blog</a>
-          <a class="nav-link box5" href="contact.php">Contact Us</a>
-
-        </li>
-
-        <li class="nav-item ">
-          <a class="nav-link " id="box-2" href="#">Login </a>
-
-        </li>
-        <li class="nav-item ">
-          <a class="nav-link" id="box-3" href="#">Become a Helper </a>
-
-        </li>
-
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle " href="#" id="navbarDropdownMenuLink" data-toggle="dropdown"
-            aria-haspopup="true" aria-expanded="false">
-            <img src="./assets/image/flag.png">
-          </a>
-          <div class="dropdown-menu img" aria-labelledby="navbarDropdownMenuLink">
-            <a class="dropdown-item" href="#">Action</a>
-            <a class="dropdown-item" href="#">Another action</a>
-            <a class="dropdown-item" href="#">Something else here</a>
-          </div>
-        </li>
-      </ul>
-    </div>
-  </nav>
- 
-
+<?php 
+   include('includes/homenav.php');
+?>
 
   <div id="hyperland">
     <div class=" hyperland">
@@ -376,7 +353,7 @@
     
     <script src="./assets/js/home.js"></script>   
 <?php 
-  include('footer.php');
+  include('includes/footer.php');
 ?>
 
 
