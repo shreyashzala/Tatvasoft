@@ -15,7 +15,7 @@
 <body>
     <!-- navbar -->
 <?php 
-     include('navbar.php');
+     include('includes/navbar.php');
 ?>
 
         <div class="banner">
@@ -65,5 +65,5 @@
 
       <!-- Footer -->
 <?php 
-      include('footer.php');
+      include('includes/footer.php');
 ?>
