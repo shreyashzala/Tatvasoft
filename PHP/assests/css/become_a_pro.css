@@ -1,0 +1,378 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+.wrapper{
+    height: 2300px;
+    width: 100%;
+}
+.wrapper .rectangle{
+    width: 1560px;
+    height: 930px;
+}
+.wrapper img{
+    position: absolute;
+}
+.wrapper .navbar{
+    position: relative;
+}
+.wrapper .navbar img{
+    height: 120px;
+    width: 156px;
+    margin-top: -40px;
+    margin-left: 2px;
+}
+.wrapper .menu{
+    margin-top: 40px;
+}
+li{
+    display: inline-block;
+    list-style: none;   
+}
+.menu li a{
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 17px;
+}
+
+.menu li .first{
+top: 21px;
+left: 706px;
+width: 75px;
+height: 20px;
+text-align: right;
+color: #ffffff;
+opacity: 1;
+letter-spacing: 0px;
+
+}
+.menu li .two{
+    
+    top: 21px;
+    left: 828px;
+    width: 129px;
+    height: 20px;
+    text-align: right;
+    letter-spacing: 0px;
+    color: #ffffff;
+    opacity: 1;
+}
+.menu li .three{
+    margin-left: 27px;
+    margin-right: 35px;
+    top:21px;
+    left: 998px;
+    width: 258px;
+    height: 20px;
+    text-align: right;
+    letter-spacing: 0px;
+    color: #FFFFFF;
+    opacity: 1;
+}
+.menu li .four{
+    
+    top: 21px;
+    left: 1313px;
+    width: 39px;
+    height: 19px;
+    text-align: right;
+    letter-spacing: 0px;
+    color: #FFFFFF;
+    opacity: 1;
+}
+.menu li .five{
+    top:21px;
+    left: 1405px;
+    width: 122px;
+    height: 19px;
+    text-align: right;
+    letter-spacing: 0px;
+    color: #ffffff;
+    opacity: 1;
+}
+.rectangle1{
+    background: #525252 0% 0% no-repeat padding-box;
+    height: 64px;
+    width: 1560px;
+}
+.box{
+   top: 12px;
+   left: 689px;
+   width: 161px;
+   height: 40px;
+   background:  #FFFFFF00 0% 0% no-repeat padding-box;
+   border: 1px solid #FFFFFF80;
+   border-radius: 20px;
+   color: #ffffff;
+   opacity: 1;
+}
+
+
+.box-three{
+    top: 12px;
+    left: 1291px;
+    width: 83px;
+    height: 40px;
+    background:  #FFFFFF00 0% 0% no-repeat padding-box;
+    border: 1px solid #FFFFFF80;
+    border-radius: 20px;
+    opacity: 1;
+}
+.box-four{
+    margin-left: 10px;
+    top: 12px;
+    left: 1384px;
+    width: 161px;
+    height: 40px;
+    background: #FFFFFF00 0% 0% no-repeat padding-box;
+    border: 1px solid #FFFFFF80;
+    border-radius: 20px;
+    opacity: 1;
+}
+
+/* Register Card */
+
+.register{
+    margin-left: auto;
+    margin-right: auto;
+    background-color: #fff;
+    max-width:430px;
+    box-shadow: 0px 0px 16px #00000026;
+  }
+  
+.card h1{
+    padding-top: 19px;
+    padding-bottom: 24px;
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    letter-spacing: 0px;
+    color: #4F4F4F;
+}
+.form-control :first-child{
+    margin-top: 24px;
+  }
+.form-control{
+    max-width: 359px;
+    height: 46px;
+    border: 1px solid #C8C8C8;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 15px;
+}
+  
+.form-control::placeholder{
+  height: 19px;
+  font-size: 16px;
+  color: #A0A0A0;
+}
+  
+.form-check{
+    max-width: 359px;
+    height: 46px;
+    margin-left: auto;
+    margin-right: auto;
+}
+  
+.phonenum{
+    max-width: 359px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 15px;
+}
+.form-check-input {
+    margin-top: 0rem;  
+    max-width: 20px;
+    height: 20px;
+}
+  
+.form-check-label{
+   margin-left: 7px;
+}
+  
+  
+.form-check-label a{
+    color: #1FB6FF;}
+  
+.recaptcha{
+        margin-left: 7%;
+}  
+.sbmtbtn{
+        margin-left: auto;
+        margin-right: auto;
+        max-width: 166px;
+        border-radius: 100%;
+}  
+.right-arrow{
+        max-width: 30px;
+        height: 11px;
+}
+.dwn {
+        padding-top: 54px;
+        padding-bottom: 8%;
+        position: relative;
+        padding-left: 50%;
+}
+.download{
+        margin-top: 11px;
+        margin-left: -38px;
+}
+.eclipce {
+    width: 40px;
+    height: 40px;
+    position: absolute;
+    margin-left: -50px;
+}
+
+
+/* Topic Starts */
+
+.topic .row img{
+    width: 300px;
+    height: 230px;
+    border-radius: 100%;
+}
+.topic .two{
+    margin-top: 100px;
+}
+.topic .three{
+    margin-top: 100px;
+}
+
+.topic .one .arrow,
+.topic .three .arrow,
+.topic .two .arrow{
+    height: 10px;
+    width: 20px;
+    margin-left: 15px;
+    margin-top: 10px;
+}
+
+/* footer style */
+.footer p{
+    margin-top: 150px;
+    margin-left: 685px;
+    width: 190px;
+    height: 21px;
+    text-align: left;
+    font-weight: 500;
+    font-size: 17px;
+    letter-spacing: 0px;
+    color: #353548;
+    opacity: 1;
+}
+.footer .box-one{
+    top: 1515px;
+    margin-left: 614px;
+    width: 233px;
+    height: 40px;
+    background: #F4F5F8 0% 0% no-repeat padding-box;
+    border: 1px solid #565656;
+    border-radius: 20px;
+    opacity: 1;
+}
+.footer .box-one .input{
+    top: 1526px;
+    width: 80px;
+    height: 16px;
+    text-align: left;
+    letter-spacing: 0px;
+    color: #565656;
+    opacity: 1;
+    text-decoration: none;
+}
+.footer .save{
+    top: 1515px;
+    left: 858px;
+    width: 88px;
+    height: 40px;
+    background: #FF7B6D 0% 0% no-repeat padding-box;
+    border-radius: 20px;
+    opacity: 1;
+}
+.footer .save a{
+    text-decoration: none;
+    color: white;
+}
+.footer{
+    margin: 55px 0;
+    
+}
+.end{
+    top: 1608px;
+    left: 0px;
+    width: 1560px;
+    height: 195px;
+    background: #111111 0% 0% no-repeat padding-box;
+    opacity: 1;
+    
+}
+.end .flex{
+    display: flex;
+}
+.end img{
+    margin-top: 20px;
+    margin-left: 115px;
+    width: 120px;
+    height: 92px;
+    background: transparent 0% 0% no-repeat padding-box;
+    opacity: 1;
+}
+.end .nav{
+    margin-top: 62px;
+    margin-left: 446px;
+    width: 582px;
+    font-size: 12px;
+    height: 44px;
+    text-align: left;
+    letter-spacing: 0px;
+    color: #F1F1F1;
+    opacity: 1;
+}
+.end .nav .two{
+    padding-left: 30px;
+}
+.end .media-icons .facebook{
+    margin-top: 61px;
+    left: 1388px;
+    width: 9px;
+    height: 18px;
+    opacity: 1;
+}
+ .end .media-icons{
+    display: flex;
+}
+.end .media-icons .instagram{
+    margin-top: 61px;
+    left: 1417px;
+    width: 20px;
+    height: 20px;
+    margin-left: 20px;
+    opacity: 1;
+}
+.end hr{
+    top: 1739px;
+    margin-left: 120px;
+    width: 1320px;
+    height: 1px;
+    background: #424242 0% 0% no-repeat padding-box;
+    opacity: 1;
+}
+.end .copy{
+    top: 1765px;
+    margin-left: 536px;
+    width: 493px;
+    height: 16px;
+    color: #F1F1F1;
+    font-size: 14px;
+    text-align: left;
+    letter-spacing: 0px;
+    opacity: 1;
+}
+
+@media (max-width:900px){
+    .wrapper{
+        width: auto;
+        height: auto;
+    }
+}
