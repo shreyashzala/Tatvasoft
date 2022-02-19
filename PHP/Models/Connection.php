@@ -102,6 +102,83 @@ class Helperland
             header('Location: http://localhost/Helperland/forgotpassword' );
         }
     }
+    
+   public function checkcode($code)
+    {
+        
+        $sql = "SELECT * FROM zipcode WHERE ZipcodeValue = '$code' ";
+        $stmt =  $this->conn->prepare($sql);
+        $stmt->execute();
+        $count = $stmt->rowCount();
+        if($count == 1){
+            echo json_encode('Yes');
+        } else{
+            echo json_encode('No');
+        }
+    }
+
+    public function addadress($address)
+    {
+        $sql = "INSERT INTO useraddress (UserId , AddressLine1 , AddressLine2 , City , zip , Mobile )
+        VALUES (:userid, :street, :house, :city, :zip, :mobile)";
+        $stmt =  $this->conn->prepare($sql);
+        $result = $stmt->execute($address);
+        if($result){
+            echo json_encode('Yes');
+        } else{
+            echo json_encode('No');
+        }
+    }
+
+    public function showaddress($userid)
+    {
+        $sql = "SELECT * FROM useraddress WHERE UserId = '$userid'";
+        $stmt =  $this->conn->prepare($sql);
+        $stmt->execute();
+        $result  = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        if($result){
+                
+            foreach($result as $row){
+                $street = $row['AddressLine1'];
+                $house = $row['AddressLine2'];
+                $address = $row['AddressId'];
+                $userid = $row['UserId'];
+                $city = $row['City'];
+                $zip = $row['zip'];
+                $mobile = $row['Mobile'];
+                $output = '<div class="card mt-3 addcard">
+                <div class="card-text">
+                <input type="radio" name="radio" id="address_id" required> <span class="font-weight-bold ml-2"> Address :</span>
+                <span id="addressline1">'.$street.'</span>&nbsp;<span id="addressline2">'.$house.'</span>  
+                <span></span> <br>
+                <span class="font-weight-bold ml-4"> Phone Number :</span>
+                <span  id="mobile">'.$mobile.'</span>
+                
+                </div>   
+            </div>';
+
+                echo ($output);
+               
+            }
+        }
+        
+
+    }
+
+    public function booking($array)
+    {
+        $service_id =  rand(100,1000);
+        $sql = "INSERT INTO servicerequest (UserId , ServiceId , ServiceDate,ZipCode )
+        VALUES (:userid,'$service_id' , :date,:code )";
+        $stmt =  $this->conn->prepare($sql);
+        $result = $stmt->execute($array);
+        if($result){
+            echo ($service_id);
+        } else{
+            echo ('No');
+        }
+    }
+
 
 }
 ?>
