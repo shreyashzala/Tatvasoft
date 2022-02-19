@@ -221,5 +221,65 @@ class HelperlandController
         header('Location:' . $base_url);
 
     }
+    
+        public function checkcode()
+    {   
+        if(isset($_POST)){
+               $code = $_POST['code'];
+               
+               $result = $this->model->checkcode($code);
+        }   
+           
+    }
+
+    public function addadress()
+    {
+        if(isset($_POST)){
+           $userid = $_POST['userid'];
+           $street = $_POST['street'];
+           $house = $_POST['houseno'];
+           $zip = $_POST['zip']; 
+           $city = $_POST['city']; 
+           $mobile = $_POST['mobile']; 
+           $address = [
+               'userid' => $userid,
+               'street' => $street,
+               'house' => $house,
+               'zip' => $zip,
+               'city' => $city,
+               'mobile' => $mobile,
+           ];
+           $result = $this->model->addadress($address);
+     } 
+    }
+
+    public function showaddress()
+    {
+        if(isset($_POST)){
+            $userid = $_POST['id'];
+            $rest = $this->model->showaddress($userid);
+            
+        }
+             
+        
+    }
+
+    public function booking()
+    {
+        if(isset($_POST)){
+            $userid = $_POST['userid'];
+            $code = $_POST['zip'];
+            $date = $_POST['date'];
+            
+            $array = [
+                'userid' => $userid,
+                'code' => $code,
+                'date' => $date,
+            ];
+            $rest = $this->model->booking($array);
+            
+        }
+    }
+
 
 }
