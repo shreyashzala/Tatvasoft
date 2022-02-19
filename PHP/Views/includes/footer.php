@@ -39,5 +39,10 @@
     <script src="./assets/js/poper.min.js"></script>
     <script src="./assets/js/bootstrap.min.js"></script>
     <script src="./assets/js/all.min.js"></script>
+
+    <script src="./assets/js/modal.js"></script>
+    <script src="./assets/js/ajax/postalcode.js"></script>
+    <script src="./assets/js/ajax/sheduleplan.js"></script>
+
 </body>
 </html>
