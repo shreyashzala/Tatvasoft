@@ -176,10 +176,10 @@
                             <div class="col-md-6">
                                 <div class="topic">how long do you need your cleaner to stay ?</div>
                                 <select class="mb-4" id="hours" onclick="hour()">
-                                    <option value="3 hrs">3 Hrs</option>
-                                    <option value="4 hrs">4 Hrs</option>
-                                    <option value="5 hrs">5 Hrs</option>
-                                    <option value="6 hrs">6 Hrs</option>
+                                    <option value="3">3 Hrs</option>
+                                    <option value="4">4 Hrs</option>
+                                    <option value="5">5 Hrs</option>
+                                    <option value="6">6 Hrs</option>
                                 </select>
                             </div>
                         </div>
@@ -358,7 +358,7 @@
                         <span id="addtime">4:00 pm</span> </p>
                         <p class="ml-3"><span id="addbed">1 bed,</span> <span id="addbath">1 bath.</span> </p>
                         <p class="ml-3 dur">Duration</p>
-                        <p class="ml-3">Basic Inside<span class="float-right mr-3" id="addhour"> 3 hrs.</span> </span></p>
+                        <p class="ml-3">Basic Inside<span class="float-right mr-3" id="addhour"> 3 hrs</span>  </span></p>
 
                         <span id="addextra1"></span>
                         <span id="addextra2"></span>
@@ -373,10 +373,11 @@
                         <p class="ml-3">Per cleaning
                             <span class="float-right mr-3 font-weight-bold"><i class="fas fa-dollar-sign"></i><span id="amount">18</span> </span>
                         </p>
+                        <div id="discount"></div>
                         <hr>
                         <p class="ml-3">Total Payment<span class="float-right mr-3 font">
-                            <i class="fas fa-dollar-sign"></i><span id="totalPayment">50</span></span>
-                            
+                            <i class="fas fa-dollar-sign"></i><span id="totalPayment">54</span></span>
+                           
                         </p><br>
                         
                     </div>
