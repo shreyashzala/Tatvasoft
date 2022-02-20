@@ -43,17 +43,37 @@ function time(){
 
 function hour(){
     var hour = $("#hours").val();
-    $('#addhour').html('<span>'+ hour +'</span>');
+    amount = $("#amount").text();
+    var pay = hour * amount;
+    $('#totalPayment').html('<span>' + pay + '</span>');
+    $('#addhour').html('<span>'+ hour +' hrs. </span>');
 }
 function extra1(){
     var tex1= $("#extra1").text();
+    var hour = $("#hours").val();
+    time1 = parseFloat(hour) + 0.5;
+    amount = $("#amount").text();
+    total_amount = amount * time1;
+    $('#totalPayment').html('<span>' + total_amount + '</span>');
     $('#addextra1').html('<p class="ml-3">'+ tex1 + '<span class="float-right mr-3"> 30 Min </span> </p>');
     $(".one").css({
         "border": "3px solid #1D7A8C"
     });
+    $('#totalservice').html('<span>' + time1 + '</span>');
 }
 function extra2(){
     var tex2= $("#extra2").text();
+    var hour = $("#hours").val();
+    if(typeof(time1) === 'undefined'){
+         time2 = parseFloat(hour) + 0.5;
+         
+    }else{
+         time2 = time1 + 0.5;
+    }
+    amount = $("#amount").text();
+    total_amount = amount * time2;
+    $('#totalPayment').html('<span>' + total_amount + '</span>');
+    $('#totalservice').html('<span>' + time2 + '</span>');
     $('#addextra2').html('<p class="ml-3">'+ tex2 + '<span class="float-right mr-3"> 30 Min </span> </p>');
     $(".two").css({
         "border": "3px solid #1D7A8C"
@@ -61,6 +81,16 @@ function extra2(){
 }
 function extra3(){
     var tex3= $("#extra3").text();
+    var hour = $("#hours").val();
+    if(typeof(time1) && typeof(time2) === 'undefined'){
+         time3 = parseFloat(hour) + 0.5;
+    }else{
+         time3 = time2 + 0.5;
+    }
+    amount = $("#amount").text();
+    total_amount = amount * time3;
+    $('#totalPayment').html('<span>' + total_amount + '</span>');
+    $('#totalservice').html('<span>' + time3 + '</span>');
     $('#addextra3').html('<p class="ml-3">'+ tex3 + '<span class="float-right mr-3"> 30 Min </span> </p>');
     $(".three").css({
         "border": "3px solid #1D7A8C"
@@ -68,6 +98,16 @@ function extra3(){
 }
 function extra4(){
     var tex4= $("#extra4").text();
+    var hour = $("#hours").val();
+    if(typeof(time1) && typeof(time2) && typeof(time3) === 'undefined'){
+         time4 = parseFloat(hour) + 0.5;
+    }else{
+         time4 = time3 + 0.5;
+    }
+    amount = $("#amount").text();
+    total_amount = amount * time4;
+    $('#totalPayment').html('<span>' + total_amount + '</span>');
+    $('#totalservice').html('<span>' + time4 + '</span>');
     $('#addextra4').html('<p class="ml-3">'+ tex4 + '<span class="float-right mr-3"> 30 Min </span> </p>');
     $(".four").css({
         "border": "3px solid #1D7A8C"
@@ -75,6 +115,16 @@ function extra4(){
 }
 function extra5(){
     var tex5= $("#extra5").text();
+    var hour = $("#hours").val();
+    if(typeof(time1) && typeof(time2) && typeof(time3) && typeof(time4) === 'undefined'){
+        time5 = parseFloat(hour) + 0.5;
+   }else{
+        time5 = time4 + 0.5;
+   }
+    amount = $("#amount").text();
+    total_amount = amount * time5;
+    $('#totalPayment').html('<span>' + total_amount + '</span>');
+    $('#totalservice').html('<span>' + time5 + '</span>');
     $('#addextra5').html('<p class="ml-3">'+ tex5 + '<span class="float-right mr-3"> 30 Min </span> </p>');
     $(".five").css({
         "border": "3px solid #1D7A8C"
@@ -154,11 +204,9 @@ function yourdetails(){
         $(".tab-content .fourth-nav").addClass('active');
     } else{
         console.log("sorry you have to enter address");
+        alert("Please Select atleast one address");
     }
-    
-    // $(".tab-content .third-tab").removeClass('active');
-    // $(".fourth-tab").addClass('active');
-    // $(".tab-content .fourth-nav").addClass('active');
+
 }
 function promocode(){
     var promocode = $('#promocode').val();
@@ -177,9 +225,11 @@ function payment(){
     var userid = $('#userid').val();
     var zip = $('#code').val();
     var date = $("#date").text();
-    var address1 = $('#addressline1').text();
-    var address2 = $('#addressline2').text();
-    var mobile = $('#mobile').text();
+    var total_hour = $('#totalservice').text();
+    var hour_rate = $("#amount").text();
+    var total = $('#totalPayment').text();
+    var hour = $("#hours").val();
+    var extra_hour = total_hour - hour; 
     
     
     
@@ -195,6 +245,10 @@ function payment(){
                         "userid" : userid,
                         "zip" : zip,
                         "date" : date,
+                        "totalhours" : total_hour,
+                        "payment" : total,
+                        "extrahour" : extra_hour,
+                        "hour_rate" : hour_rate,
                     },
                     success:function(data2){
                       alert("Your Booking Is Confirmed & Your Service Id is : "+ data2);
@@ -210,5 +264,5 @@ function payment(){
     } else{
         $('#pay').html('<p class="alert alert-danger"> Card Number is invalid </p>');
     }
-
+    
 }
