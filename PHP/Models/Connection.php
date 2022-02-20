@@ -168,8 +168,8 @@ class Helperland
     public function booking($array)
     {
         $service_id =  rand(100,1000);
-        $sql = "INSERT INTO servicerequest (UserId , ServiceId , ServiceDate,ZipCode )
-        VALUES (:userid,'$service_id' , :date,:code )";
+        $sql = "INSERT INTO servicerequest (UserId , ServiceId , ServiceDate, ZipCode, ServiceHourlyRate, ServiceHours, ExtraHours, SubTotal )
+        VALUES (:userid,'$service_id' , :date,:code, :hour_rate, :total_hour, :extra_hour, :payment )";
         $stmt =  $this->conn->prepare($sql);
         $result = $stmt->execute($array);
         if($result){
