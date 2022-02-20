@@ -264,17 +264,24 @@ class HelperlandController
         
     }
 
-    public function booking()
+   public function booking()
     {
         if(isset($_POST)){
             $userid = $_POST['userid'];
             $code = $_POST['zip'];
             $date = $_POST['date'];
-            
+            $total_hour = $_POST['totalhours'];
+            $extra_hour = $_POST['extrahour'];
+            $hour_rate = $_POST['hour_rate'];
+            $payment = $_POST['payment'];
             $array = [
                 'userid' => $userid,
                 'code' => $code,
                 'date' => $date,
+                'payment' => $payment,
+                'total_hour' => $total_hour,
+                'hour_rate' => $hour_rate,
+                'extra_hour' => $extra_hour,
             ];
             $rest = $this->model->booking($array);
             
