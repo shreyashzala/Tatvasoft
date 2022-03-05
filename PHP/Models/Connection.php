@@ -25,14 +25,6 @@ class Helperland
         $stmt =  $this->conn->prepare($sql);
         $result = $stmt->execute($array);
         return $result;
-
-        if ($result) {
-            $_SESSION['message'] = "Message Has Been Sent Succesfully";
-        } else {
-            $_SESSION['message'] = "Your Account is not Created Please Try Again.";
-        }
-        return $_SESSION['message'];
-            
     }
 
     public function register($register)
@@ -47,32 +39,14 @@ class Helperland
 
     public function login($email,$password)
     {
-        $base_url = "http://localhost/Helperland/";
-        $customer = "http://localhost/Helperland/service_history";
-        $sp = "http://localhost/Helperland/upcoming_service";
         
-
         $sql = "SELECT * FROM user WHERE Email = '$email' AND Password = '$password' ";
         $stmt =  $this->conn->prepare($sql);
         $stmt->execute();
         $row  = $stmt->fetch(PDO::FETCH_ASSOC);
         $count = $stmt->rowCount();
-        $usertypeid = $row['UserTypeId'];
+        return $row;
         
-        if($count == 1){
-            if($usertypeid == 1){
-                $_SESSION['name'] = $row['FirstName'];
-                header('Location:' . $customer);
-            }else if($usertypeid == 2){
-                $_SESSION['name'] = $row['FirstName'];
-                header('Location:' . $sp);
-            } else{
-                echo "Admin";
-            }
-        } else{
-            $_SESSION['name'] = "Invalid details";
-            header('Location:' . $base_url);
-        }
  
     }
 
@@ -89,32 +63,18 @@ class Helperland
     {
         $sql = "UPDATE user SET Password = '$newpass' WHERE Email = '$email'";
         $stmt =  $this->conn->prepare($sql);
-        $stmt->execute();
-
-        if($stmt){
- 
-            $_SESSION['msg'] = "Password Updated Please Relogin";
-            header('Location: http://localhost/Helperland/' );
-        } else{
-            echo '<script>
-            alert("Some error occured....");
-            </script>';
-            header('Location: http://localhost/Helperland/forgotpassword' );
-        }
-    }
-    
-   public function checkcode($code)
-    {
+        $result = $stmt->execute();
+        return $result;
         
+    }
+
+    public function checkcode($code)
+    { 
         $sql = "SELECT * FROM zipcode WHERE ZipcodeValue = '$code' ";
         $stmt =  $this->conn->prepare($sql);
         $stmt->execute();
         $count = $stmt->rowCount();
-        if($count == 1){
-            echo json_encode('Yes');
-        } else{
-            echo json_encode('No');
-        }
+        return $count;
     }
 
     public function addadress($address)
@@ -123,11 +83,8 @@ class Helperland
         VALUES (:userid, :street, :house, :city, :zip, :mobile)";
         $stmt =  $this->conn->prepare($sql);
         $result = $stmt->execute($address);
-        if($result){
-            echo json_encode('Yes');
-        } else{
-            echo json_encode('No');
-        }
+        return $result;
+        
     }
 
     public function showaddress($userid)
@@ -136,49 +93,157 @@ class Helperland
         $stmt =  $this->conn->prepare($sql);
         $stmt->execute();
         $result  = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        if($result){
-                
-            foreach($result as $row){
-                $street = $row['AddressLine1'];
-                $house = $row['AddressLine2'];
-                $address = $row['AddressId'];
-                $userid = $row['UserId'];
-                $city = $row['City'];
-                $zip = $row['zip'];
-                $mobile = $row['Mobile'];
-                $output = '<div class="card mt-3 addcard">
-                <div class="card-text">
-                <input type="radio" name="radio" id="address_id" required> <span class="font-weight-bold ml-2"> Address :</span>
-                <span id="addressline1">'.$street.'</span>&nbsp;<span id="addressline2">'.$house.'</span>  
-                <span></span> <br>
-                <span class="font-weight-bold ml-4"> Phone Number :</span>
-                <span  id="mobile">'.$mobile.'</span>
-                
-                </div>   
-            </div>';
-
-                echo ($output);
-               
-            }
-        }
+        return $result;
+        
         
 
     }
 
     public function booking($array)
     {
-        $service_id =  rand(100,1000);
-        $sql = "INSERT INTO servicerequest (UserId , ServiceId , ServiceDate, ZipCode, ServiceHourlyRate, ServiceHours, ExtraHours, SubTotal )
-        VALUES (:userid,'$service_id' , :date,:code, :hour_rate, :total_hour, :extra_hour, :payment )";
+        
+        $sql = "INSERT INTO servicerequest (UserId , ServiceId , ServiceDate, ZipCode, ServiceHourlyRate, ServiceHours, ExtraHours, SubTotal , Discount, TotalCost, Status, address )
+        VALUES (:userid,:service_id , :date,:code, :hour_rate, :total_hour, :extra_hour, :totalcost , :discount,:payment, :status, :addressId )";
         $stmt =  $this->conn->prepare($sql);
         $result = $stmt->execute($array);
-        if($result){
-            echo ($service_id);
-        } else{
-            echo ('No');
-        }
+        return $result;
+        
     }
 
+    public function dashboard_details($userid)
+    {
+        $sql = "SELECT * FROM servicerequest WHERE UserId = '$userid' AND Status = 'Pending'";
+        $stmt =  $this->conn->prepare($sql);
+        $stmt->execute();
+        $result_dashboard  = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $count = $stmt->rowCount();
+        return $result_dashboard;
+    }
+    public function history($userid)
+    {
+        $sql = "SELECT * FROM servicerequest WHERE UserId = '$userid'";
+        $stmt =  $this->conn->prepare($sql);
+        $stmt->execute();
+        $result  = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $count = $stmt->rowCount();
+        return $result;
+        
+    }
 
+    public function user_details($userid)
+    {
+        $sql = "SELECT * FROM user WHERE UserId = '$userid'";
+        $stmt =  $this->conn->prepare($sql);
+        $stmt->execute();
+        $result  = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+        
+    }
+
+    public function showuseraddress($userid)
+    {
+        $deleted = '0';
+        $sql = "SELECT * FROM useraddress WHERE UserId = '$userid' AND IsDeleted = '$deleted'";
+        $stmt =  $this->conn->prepare($sql);
+        $stmt->execute();
+        $result  = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+        
+        
+
+    }
+
+    public function updatepassword($userid,$newpwd,$oldpwd)
+    {
+        $sql = "UPDATE user SET Password = '$newpwd' WHERE UserId = '$userid' AND Password = '$oldpwd'";
+        $stmt =  $this->conn->prepare($sql);
+        $result = $stmt->execute();
+        $count = $stmt->rowCount();
+        return $count;
+        
+    }
+
+    public function updateinfo($array)
+    {
+        $sql = "UPDATE `user` SET `FirstName` = :fname, `LastName` = :lname, `Mobile` = :mobile, `DateOfBirth` = :dob , `LanguageId` = :languageid WHERE `UserId` = :id ";
+        $stmt =  $this->conn->prepare($sql);
+        $result = $stmt->execute($array);
+        $count = $stmt->rowCount();
+        return $count;
+
+        
+
+    }
+
+    public function deleteaddress($userid)
+    {
+        $sql = "UPDATE useraddress SET IsDeleted = 1 WHERE AddressId = '$userid'";
+        $stmt =  $this->conn->prepare($sql);
+        $result = $stmt->execute();
+        $count = $stmt->rowCount();
+        return $count;
+        
+    }
+
+    public function editaddress($userid)
+    {
+        $sql = "SELECT * FROM useraddress WHERE AddressId = '$userid'";
+        $stmt =  $this->conn->prepare($sql);
+        $stmt->execute();
+        $result  = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $result;   
+    }
+
+    public function updateaddress($array)
+    {
+        $sql ="UPDATE `useraddress` SET `AddressLine1` = :sname ,`AddressLine2` = :house, `City` = :city, `zip` = :zip, `Mobile` = :mobile WHERE `AddressId` = :id ";
+        $stmt =  $this->conn->prepare($sql);
+        $result = $stmt->execute($array);
+        $count = $stmt->rowCount();
+        return $count;
+
+        
+    }
+
+    public function rating($array)
+    {
+        $ratingto = '5';
+        $sql = "INSERT INTO rating(ServiceRequestId,RatingFrom,RatingTo,Ratings,Comments,RatingDate,OnTimeArrival,Friendly,QualityOfService) VALUES (:serviceid,:id,'$ratingto',:total,:comment,:ratingdate,:info1,:info2,:info3)";
+        $stmt =  $this->conn->prepare($sql);
+        $result = $stmt->execute($array);
+        return $result;
+
+    }
+
+    public function bookingdetails($servicereqid)
+    {
+        $sql = "SELECT ServiceId,ServiceDate,ServiceHours,SubTotal,ExtraHours, user.Email,user.Mobile,useraddress.AddressLine1,useraddress.AddressLine2 FROM `servicerequest` JOIN `user` ON servicerequest.UserId = user.UserId JOIN `useraddress` ON servicerequest.address = useraddress.AddressId WHERE ServiceRequestId = '$servicereqid'";
+        $stmt =  $this->conn->prepare($sql);
+        $stmt->execute();
+        $result  = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+
+    }
+
+    public function cancelrequest($servicereqid , $issue)
+    {
+        $sql="UPDATE servicerequest SET Status = 'Cancelled' , HasIssue = '$issue' WHERE ServiceRequestId = '$servicereqid'";
+        $stmt =  $this->conn->prepare($sql);
+        $result = $stmt->execute();
+        $count = $stmt->rowCount();
+        return $count;
+        
+    }
+
+    public function reschedulerequest($servicereqid,$newdate)
+    {
+        $sql="UPDATE servicerequest SET ServiceDate = '$newdate',Status = 'Rescheduled' WHERE ServiceRequestId = '$servicereqid'";
+        $stmt =  $this->conn->prepare($sql);
+        $result = $stmt->execute();
+        $count = $stmt->rowCount();
+        return $count; 
+        
+    }
 }
 ?>
+
