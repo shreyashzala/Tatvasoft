@@ -147,15 +147,15 @@ class HelperlandController
     
     public function login()
     {
-        $base_url = "http://localhost/Helperland/";
+        $base_url ="http://localhost/Helperland/#loginmodal";
         $customer = "http://localhost/Helperland/cust_dashboard";
-        $sp = "http://localhost/Helperland/upcoming_service";
+        $sp = "http://localhost/Helperland/sp_upcoming_service";
         
         if(isset($_POST['submit'])){
 
             if(($_POST['email'] == "") || ($_POST['password'] == "")){
-                
-                $base_url ="http://localhost/Helperland/includes/error";
+
+                $_SESSION['err'] = '<p class="alert alert-warning">fill all details</p>';
                 header('Location:' . $base_url);
                 
             } else{
@@ -174,14 +174,15 @@ class HelperlandController
                         header('Location:' . $customer);
                 }else if($usertypeid == 2){
                         $_SESSION['name'] = $row['FirstName'];
+                        $_SESSION['id'] = $row['UserId'];
                         header('Location:' . $sp);
                } else{
                         echo "Admin";
                 }
             } else{
-                     $_SESSION['name'] = "Invalid details";
+                     $_SESSION['err'] = '<p class="alert alert-warning">Invalid details</p>';
                      header('Location:' . $base_url);
-                     unset($_SESSION['name']);
+                     
         }
 
                 
@@ -393,6 +394,7 @@ class HelperlandController
                     $servicehour = $row['ServiceHours'];
                     $payment = $row['TotalCost'];
                     $count = count($rest);
+                    
                     $output = '<tr id="unique-'.$req_Id.'" name="'.$req_Id.'">
                     <td data-toggle="modal" data-target="#servicedetailsmodal"> '.$serviceid.' 
                     </td>
@@ -412,10 +414,9 @@ class HelperlandController
                       <button class="btn text-light cancel-btn" id="cancel" data-toggle="modal" data-target="#cancelmodal" style="border-radius : 20px; background-color : rgb(238, 48, 80) !important">Cancel</button>
                       <input type="hidden" id="records" value="'.$count.'">
                     </td>
-                </tr>
-                ';
-    
-                echo $output;
+                </tr>';
+                
+                echo ($output);
                 }
             }
         }
@@ -810,6 +811,445 @@ class HelperlandController
                 echo ($servicereqid);
             } else{
                 echo 0;
+            }
+        }
+    }
+
+    public function newrequest()
+    {
+        if(isset($_POST))
+        {
+            $sp_id = $_POST['id'];
+            $result = $this->model->newrequest($sp_id);
+            if($result){
+                foreach($result as $row){
+                    $servicereqid = $row['ServiceRequestId'];
+                    $serviceid = $row['ServiceId'];
+                    $date = $row['ServiceDate'];
+                    $hour = $row['ServiceHours'];
+                    $fname = $row['FirstName'];
+                    $lname = $row['LastName'];
+                    $address_1 = $row['AddressLine1'];
+                    $address_2 = $row['AddressLine2'];
+                    $payment = $row['TotalCost'];
+                    $count = count($result);
+
+                    $output ='<tr name="'.$servicereqid.'">
+                    <td>'.$serviceid.'</td>
+                    <td><img src="./assets/image/calendar2.png" alt=""> '.$date.'<br>
+                        <img src="./assets/image/layer-712.png" alt=""> '.$hour.'
+                    </td>
+                    <td>'.$fname.'&nbsp;'.$lname.' <br>
+                        <img src="./assets/image/layer-719.png" alt=""> '.$address_1.' &nbsp; '.$address_2.'
+                    </td>
+                    <td><i class="fas fa-dollar-sign"></i> '.$payment.'</td>
+                    <td>Time Conflict</td>
+                    <td>
+                    <button class="btn btn-primary open-btn" style="background-color : blue !important"
+                    data-toggle="modal" data-target="#acceptrequestmodal">Accept</button> 
+                    <input type="hidden" id="records" value="'.$count.'">
+                    </td>
+                </tr>';
+
+                echo ($output);
+                }
+            }
+        }
+    }
+
+    public function acceptrequestmodel()
+    {
+        if(isset($_POST))
+        {
+            $req_id = $_POST['reqid'];
+            $result = $this->model->acceptrequestmodel($req_id);
+            if($result){
+                foreach($result as $row){
+                    $serviceid = $row['ServiceId'];
+                    $date = $row['ServiceDate'];
+                    $hour = $row['ServiceHours'];
+                    $fname = $row['FirstName'];
+                    $lname = $row['LastName'];
+                    $address_1 = $row['AddressLine1'];
+                    $address_2 = $row['AddressLine2'];
+                    $payment = $row['TotalCost'];
+
+                    $output = '<h2>'.$date.'</h2>
+                    <span class="text-secondary font-weight-bold">Duration : </span>&nbsp; <span>'.$hour.' hrs.</span>
+                    <hr>
+                    <span class="text-secondary font-weight-bold">Service Id :</span>&nbsp;<span>'.$serviceid.'</span>
+                    <br>
+                    <span class="text-secondary font-weight-bold">Net Amount :</span>&nbsp;<i class="fas fa-dollar-sign"></i><span class="text-dark font-weight-bold">'.$payment.'</span>
+                    <br>
+                    <hr>
+                    <span class="text-secondary font-weight-bold">Customer Name :</span> '.$fname.'  '.$lname.'<span></span>
+                    <br>
+                    <span class="text-secondary font-weight-bold"> Service Address :</span>&nbsp;<span>'.$address_1.'</span>&nbsp;<span>'.$address_2.'</span>
+                    <br>
+                    
+                    <hr>
+                    <p class="text-secondary font-weight-bold">Comments</p>
+                    <span>I do not Have Pets at home.</span>
+                    ';
+    
+                    echo($output);
+                }
+            }
+        }
+    }
+
+    public function acceptrequest()
+    {
+        if(isset($_POST))
+        {
+            $req_id = $_POST['reqid'];
+            $sp_id = $_POST['id'];
+            $result = $this->model->acceptrequest($req_id,$sp_id);
+            if($result == 1){
+                echo 1;
+            } else {
+                echo 0;
+            }
+
+        }
+    }
+
+    public function upcomingservices()
+    {
+        if(isset($_POST))
+        {
+            $sp_id = $_POST['id'];
+            $result = $this->model->upcomingservices($sp_id);
+            if($result){
+                foreach($result as $row){
+                    $servicereqid = $row['ServiceRequestId'];
+                    $serviceid = $row['ServiceId'];
+                    $date = $row['ServiceDate'];
+                    $hour = $row['ServiceHours'];
+                    $fname = $row['FirstName'];
+                    $lname = $row['LastName'];
+                    $address_1 = $row['AddressLine1'];
+                    $address_2 = $row['AddressLine2'];
+                    $payment = $row['TotalCost'];
+                    $count = count($result);
+
+                    $output ='<tr name="'.$servicereqid.'">
+                    <td data-toggle="modal" data-target="#showdatamodal">'.$serviceid.'</td>
+                    <td data-toggle="modal" data-target="#showdatamodal"><img src="./assets/image/calendar2.png" alt=""> '.$date.'<br>
+                        <img src="./assets/image/layer-712.png" alt=""> '.$hour.'
+                    </td>
+                    <td data-toggle="modal" data-target="#showdatamodal">'.$fname.'&nbsp;'.$lname.' <br>
+                        <img src="./assets/image/layer-719.png" alt=""> '.$address_1.' &nbsp; '.$address_2.'
+                    </td>
+                    <td data-toggle="modal" data-target="#showdatamodal"><i class="fas fa-dollar-sign"></i> '.$payment.'</td>
+                    
+                    <td>
+                    <button class="btn btn-danger cancel-req" name="'.$servicereqid.'">Cancel</button> 
+                    <input type="hidden" id="records" value="'.$count.'">
+                    </td>
+                </tr>';
+
+                echo ($output);
+                }
+            }
+        }
+    }
+
+    public function sp_history()
+    {
+        if(isset($_POST))
+        {
+            $sp_id = $_POST['id'];
+            $result = $this->model->sp_history($sp_id);
+            if($result){
+                foreach($result as $row){
+                    $servicereqid = $row['ServiceRequestId'];
+                    $serviceid = $row['ServiceId'];
+                    $date = $row['ServiceDate'];
+                    $hour = $row['ServiceHours'];
+                    $fname = $row['FirstName'];
+                    $lname = $row['LastName'];
+                    $address_1 = $row['AddressLine1'];
+                    $address_2 = $row['AddressLine2'];
+                    $payment = $row['TotalCost'];
+                    $count = count($result);
+
+                    $output ='<tr name="'.$servicereqid.'">
+                    <td>'.$serviceid.'
+                    <input type="hidden" id="records" value="'.$count.'">
+                    </td>
+                    <td><img src="./assets/image/calendar2.png" alt=""> '.$date.'<br>
+                        <img src="./assets/image/layer-712.png" alt=""> '.$hour.'
+                    </td>
+                    <td>'.$fname.'&nbsp;'.$lname.' <br>
+                        <img src="./assets/image/layer-719.png" alt=""> '.$address_1.' &nbsp; '.$address_2.'
+                    </td>
+                </tr>';
+
+                echo ($output);
+                }
+            }
+        }
+    }
+
+    public function showdata()
+    {
+        if(isset($_POST))
+        {
+            $req_id = $_POST['id'];
+            // This is used further for showing map
+        }
+    }
+
+    public function completeservicereq()
+    {
+        if(isset($_POST))
+        {
+            $req_id = $_POST['reqid'];
+            $result = $this->model->completeservicereq($req_id);
+            if($result == 1){
+                echo 1;
+            } else {
+                echo 0;
+            }
+        }
+    }
+    public function cancelservicereq()
+    {
+        if(isset($_POST))
+        {
+            $req_id = $_POST['reqid'];
+            $result = $this->model->cancelservicereq($req_id);
+            if($result == 1){
+                echo 1;
+            } else {
+                echo 0;
+            }
+        }
+    }
+    public function getallspdetails()
+    {
+        if(isset($_POST))
+        {
+            $sp_id = $_POST['id'];
+            $result = $this->model->getallspdetails($sp_id);
+            if($result){
+                foreach($result as $row){
+                    $fname = $row['FirstName'];
+                    $lname = $row['LastName'];
+                    $email = $row['Email'];
+                    $mobile = $row['Mobile'];
+                    $dob = $row['DateOfBirth'];
+                    $nation = $row['NationalityId'];
+                    $sname = $row['AddressLine1'];
+                    $houseno = $row['AddressLine2'];
+                    $code = $row['zip'];
+                    $city = $row['City'];
+                    $gender = $row['Gender'];
+
+                    $output = [$fname,$lname,$email,$mobile,$dob,$nation,$sname,$houseno,$code,$city,$gender];
+
+                    echo json_encode($output);
+                }
+            }
+        }
+    }
+
+    public function updatespinfo()
+    {
+        if(isset($_POST))
+        {
+            $sp_id = $_POST['id'];
+            $fname = $_POST['fname'];
+            $lname = $_POST['lname'];
+            $mobile = $_POST['mobile'];
+            $gender = $_POST['gender'];
+            $dob = $_POST['dob'];
+            $nation = $_POST['nation'];
+            $street = $_POST['sname'];
+            $houseno = $_POST['houseno'];
+            $city = $_POST['city'];
+            $code = $_POST['code'];
+
+            $array1 = [
+                'sp_id' => $sp_id,
+                'fname' => $fname,
+                'lname' => $lname,
+                'mobile' => $mobile,
+                'dob' => $dob,
+                'gender' => $gender,
+                'nation' => $nation,
+            ];
+            $result1 = $this->model->updatespdetails($array1);
+
+            $array2=[
+                'sp_id' => $sp_id,
+                'sname' => $street,
+                'houseno' => $houseno,
+                'city' => $city,
+                'code' => $code,
+            ];
+            $result2 = $this->model->updatespaddress($array2);
+
+            if(($result1 == 1) || ($result2 == 1)){
+                echo 1;
+            } else {
+                echo 0;
+            }
+        }
+    }
+
+    public function getuserdetails()
+    {
+        if(isset($_POST))
+        {
+            $sp_id = $_POST['id'];
+            $result = $this->model->getuserdetails($sp_id);
+            if($result){
+                foreach($result as $row){
+                    $userid = $row['UserId'];
+                    $fname = $row['FirstName'];
+                    $lname = $row['LastName'];
+                    $block = $row['IsBlocked'];
+                    if($block == 1){
+                        $btn = 'Unblock';
+                    } else{
+                        $btn = 'Block';
+                    }
+
+                    $output = '<div class="col-md-4">
+                    <div class="card">
+                      <div class="card-text">
+                        <div class="text-center mt-3">
+                            <img src="assets/image/avatar-hat.png" alt="user">
+                        </div>
+                        
+                        <p class="text-center mt-3 text-secondary font-weight-bold">'.$fname.' '.$lname.'</p>
+                        <div class="text-center mt-3 mb-3" name="'.$userid.'">
+                           <button class="btn text-light customer" style="background-color:rgb(238, 48, 80); border-radius: 20px;">'.$btn.'</button>
+                        </div>
+                        
+                      </div>
+                     </div>
+                    
+                </div>';
+
+                echo $output;
+                }
+            }
+        }
+    }
+
+    public function blockcustomer()
+    {
+        if(isset($_POST))
+        {
+            $sp_id = $_POST['id'];
+            $userid = $_POST['userid'];
+            $result = $this->model->blockcustomer($sp_id,$userid);
+            if($result){
+                echo 1;
+            } else {
+                echo 0;
+            }
+        }
+    }
+    public function unblockcustomer()
+    {
+        if(isset($_POST))
+        {
+            $sp_id = $_POST['id'];
+            $userid = $_POST['userid'];
+            $result = $this->model->unblockcustomer($sp_id,$userid);
+            if($result){
+                echo 1;
+            } else {
+                echo 0;
+            }
+        }
+    }
+
+    public function sprating()
+    {
+        if(isset($_POST))
+        {
+            $sp_id = $_POST['id'];
+            $result = $this->model->sprating($sp_id);
+            if($result){
+                foreach($result as $row){
+                    $serviceid = $row['ServiceId'];
+                    $fname = $row['FirstName'];
+                    $lname = $row['LastName'];
+                    $date = $row['ServiceDate'];
+                    $time = $row['ServiceHours'];
+                    $rating = $row['Ratings'];
+                    $comment = $row['Comments'];
+ 
+                    if($rating == 1){
+                        $rate = '<i class="fa fa-star" style="color:yellow !important;"></i>
+                        <i class="fa fa-star" style="color:rgb(207, 196, 196) !important;"></i>
+                        <i class="fa fa-star" style="color:rgb(207, 196, 196) !important;"></i>
+                        <i class="fa fa-star" style="color:rgb(207, 196, 196) !important;"></i>
+                        <i class="fa fa-star" style="color: rgb(207, 196, 196) !important;"></i>';
+                    } else if($rating == 2){
+                        $rate = '<i class="fa fa-star" style="color:yellow !important;"></i>
+                        <i class="fa fa-star" style="color:yellow !important;"></i>
+                        <i class="fa fa-star" style="color:rgb(207, 196, 196) !important;"></i>
+                        <i class="fa fa-star" style="color:rgb(207, 196, 196) !important;"></i>
+                        <i class="fa fa-star" style="color: rgb(207, 196, 196) !important;"></i>';
+                    } else if($rating == 3){
+                        $rate = '<i class="fa fa-star" style="color:yellow !important;"></i>
+                        <i class="fa fa-star" style="color:yellow !important;"></i>
+                        <i class="fa fa-star" style="color:yellow !important;"></i>
+                        <i class="fa fa-star" style="color:rgb(207, 196, 196) !important;"></i>
+                        <i class="fa fa-star" style="color: rgb(207, 196, 196) !important;"></i>';
+                    } else if($rating == 4){
+                        $rate = '<i class="fa fa-star" style="color:yellow !important;"></i>
+                        <i class="fa fa-star" style="color:yellow !important;"></i>
+                        <i class="fa fa-star" style="color:yellow !important;"></i>
+                        <i class="fa fa-star" style="color:yellow !important;"></i>
+                        <i class="fa fa-star" style="color: rgb(207, 196, 196) !important;"></i>';
+                    } else {
+                        $rate = '<i class="fa fa-star" style="color:yellow !important;"></i>
+                        <i class="fa fa-star" style="color:yellow !important;"></i>
+                        <i class="fa fa-star" style="color:yellow !important;"></i>
+                        <i class="fa fa-star" style="color:yellow !important;"></i>
+                        <i class="fa fa-star" style="color:yellow !important;"></i>';
+                    }
+
+
+
+                    $output = '<div class="card">
+                    <div class="row card-text">
+                        <div class="col-md-3 ml-2 mt-2">
+                               <p class="text-secondary">'.$serviceid.'</p>
+                               <p class="text-secondary font-weight-bold">'.$fname.' '.$lname.'</p>
+                        </div>
+                        <div class="col-md-3 ml-2 mt-2">
+                              <p class="text-secondary font-weight-bold">
+                              <img src="./assets/image/calendar2.png" alt="cal">    
+                              '.$date.'</p>
+                              <p class="text-secondary">
+                              <img src="./assets/image/layer-712.png" alt="time">    
+                              '.$time.'</p>
+                        </div>
+                        <div class="col-md-5 ml-2 mt-2">
+                            <p class="text-center text-secondary font-weight-bold">rating : '.$rating.'</p>
+                            <p class="text-center">'.$rate.'</p>
+                        </div>
+                     </div>
+                     <hr>
+                     <div class="comment ml-2 mb-2">
+                         <a class="text-secondary font-weight-bold" data-toggle="collapse" href="#comment">Customer Comment</a>
+                         <div id="comment" class="collapse">
+                             <p>'.$comment.'</p>
+                         </div>
+                     </div>
+                    </div>
+                    <br>';
+
+                    echo $output;
+                }
             }
         }
     }
