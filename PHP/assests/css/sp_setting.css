@@ -124,18 +124,40 @@ li{
     width: 100%;
 }
 
-.row .table{
-        margin-top: 30px;
-        font-size: 13px;
-        border: 2px solid #F9F9F9;
+.row .tabs{
+    margin-top: 30px;
+    
 }
-.row .table tr td button{
-    border-radius: 20px;
+.row ul .li-one,
+.row ul .li-two{
+    width: 45%;
+    text-align: center;
+    
 }
-.row .table thead{
-    background: #F9F9F9;
-    color: #646464;
+.row ul .li-one .active,
+.row ul .li-two .active{
+    border-bottom: 3px solid blue;
 }
+
+.row ul li .heading {
+    border: 2px solid white;
+    color: gray !important;
+    font-size: 20px;
+}
+.save{
+    border-radius: 20px !important;
+    background: #1D7A8C !important;
+    width: 100px;
+    height: 40px;
+}
+
+.row ul li a{
+    text-decoration: none;
+}
+
+
+
+
 .drop{
     margin-left: 1350px !important;
 }
