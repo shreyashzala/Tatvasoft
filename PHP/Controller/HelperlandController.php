@@ -79,6 +79,7 @@ class HelperlandController
                         'mobile' => $mobile,
                         'password' => $password,
                         'UserTypeId' => $usertype,
+                        'CreatedDate' => date('Y-m-d'),
                         'token' => $token,
                     ];
                     $result = $this->model->register($register);
@@ -128,6 +129,7 @@ class HelperlandController
                         'mobile' => $mobile,
                         'password' => $password,
                         'UserTypeId' => $usertype,
+                        'CreatedDate' => date('Y-m-d'),
                         'token' => $token,
                     ];
                     $result = $this->model->register($register);
@@ -150,6 +152,7 @@ class HelperlandController
         $base_url ="http://localhost/Helperland/#loginmodal";
         $customer = "http://localhost/Helperland/cust_dashboard";
         $sp = "http://localhost/Helperland/sp_upcoming_service";
+        $admin = "http://localhost/Helperland/admin_service_request";
         
         if(isset($_POST['submit'])){
 
@@ -175,9 +178,19 @@ class HelperlandController
                 }else if($usertypeid == 2){
                         $_SESSION['name'] = $row['FirstName'];
                         $_SESSION['id'] = $row['UserId'];
-                        header('Location:' . $sp);
+                        $_SESSION['active'] = $row['IsActive'];
+                        if($_SESSION['active'] == 1){
+                            $_SESSION['err'] = '<p class="alert alert-warning">Your Account is Inactive</p>';
+                            header('Location:' . $base_url);
+                        } else{
+                             header('Location:' . $sp);
+                        }
+                        
                } else{
-                        echo "Admin";
+                        
+                        $_SESSION['name'] = $row['FirstName'];
+                        $_SESSION['id'] = $row['UserId'];
+                        header('Location:' . $admin);
                 }
             } else{
                      $_SESSION['err'] = '<p class="alert alert-warning">Invalid details</p>';
@@ -356,6 +369,7 @@ class HelperlandController
             $discount = $_POST['discount'];
             $totalcost = $payment + $discount;
             $address_id = $_POST['addressId'];
+            $time = $_POST['stime'];
             $service_id =  rand(100,1000);
             $array = [
                 'userid' => $userid,
@@ -370,6 +384,7 @@ class HelperlandController
                 'totalcost' => $totalcost,
                 'addressId' => $address_id,
                 'service_id' =>$service_id,
+                'servicestarttime' => $time,
                 
             ];
             $result = $this->model->booking($array);
@@ -394,12 +409,45 @@ class HelperlandController
                     $servicehour = $row['ServiceHours'];
                     $payment = $row['TotalCost'];
                     $count = count($rest);
+                    $stime = $row['ServiceStartTime'];
+                    $endtime = intval($stime)  + $servicehour;
+                    if($endtime >= 12){
+                        $pm = 1;
+                        $dummy = $endtime - 12;
+                        $var1 = intval($dummy);
+                        $min = $dummy - $var1;
+                          if($min == 0.5){
+                              $min = 30;
+                          } else{
+                              $min = 00;
+                          }
+                        
+                    } else{
+                        $pm = 0;
+                        $dummy = $endtime;
+                        $var1 = intval($dummy);
+                        $min = $dummy - $var1;
+                          if($min == 0.5){
+                              $min = 30;
+                          } else{
+                              $min = 00;
+                          }
+                    }
+
+                    if($pm == 1){
+                        $var2 = "PM";
+                    } else{
+                        $var2 = "AM";
+                    }
+                    
+                    
+
                     
                     $output = '<tr id="unique-'.$req_Id.'" name="'.$req_Id.'">
                     <td data-toggle="modal" data-target="#servicedetailsmodal"> '.$serviceid.' 
                     </td>
                     <td data-toggle="modal" data-target="#servicedetailsmodal"><img src="./assets/image/calendar.png" alt="calender"> '.$servicedate.' <br>
-                    <img src="./assets/image/layer-712.png" alt="clock"> '.$servicehour.' hrs.
+                    <img src="./assets/image/layer-712.png" alt="clock"> '.$stime.'-'.$var1.':'.$min.' '.$var2.'
                     </td>
                     <td>
                         
@@ -428,34 +476,114 @@ class HelperlandController
             $result = $this->model->history($userid);
             if($result){
                 foreach($result as $row){
-                    $serviceid = $row['ServiceRequestId'];
+                    $servicereqid = $row['ServiceRequestId'];
                     $servicestatus= $row['Status'];
                     $servicedate = $row['ServiceDate'];
                     $servicehour = $row['ServiceHours'];
                     $payment = $row['TotalCost'];
+                    $spname = $row['ServiceProviderId'];
                     $count = count($result);
-                    $output = '<tr name="'.$serviceid.'">
+                    $stime = $row['ServiceStartTime'];
+                    $endtime = intval($stime)  + $servicehour;
+                    if($endtime >= 12){
+                        $pm = 1;
+                        $dummy = $endtime - 12;
+                        $var1 = intval($dummy);
+                        $min = $dummy - $var1;
+                          if($min == 0.5){
+                              $min = 30;
+                          } else{
+                              $min = 00;
+                          }
+                        
+                    } else{
+                        $pm = 0;
+                        $dummy = $endtime;
+                        $var1 = intval($dummy);
+                        $min = $dummy - $var1;
+                          if($min == 0.5){
+                              $min = 30;
+                          } else{
+                              $min = 00;
+                          }
+                    }
+
+                    if($pm == 1){
+                        $var2 = "PM";
+                    } else{
+                        $var2 = "AM";
+                    }
+
+                    if(($spname != '') && ($servicestatus == "Completed")){
+                        $sp_name = $this->model->GetSP($servicereqid);
+                        $rating = $this->model->GetRating($spname);
+
+                        $full_rating = ceil($rating);
+
+                        if($full_rating == 1){
+                            $rate = '<i class="fa fa-star" style="color:yellow !important;"></i>
+                            <i class="fa fa-star" style="color:rgb(207, 196, 196) !important;"></i>
+                            <i class="fa fa-star" style="color:rgb(207, 196, 196) !important;"></i>
+                            <i class="fa fa-star" style="color:rgb(207, 196, 196) !important;"></i>
+                            <i class="fa fa-star" style="color: rgb(207, 196, 196) !important;"></i>';
+                        } else if($full_rating == 2){
+                            $rate = '<i class="fa fa-star" style="color:yellow !important;"></i>
+                            <i class="fa fa-star" style="color:yellow !important;"></i>
+                            <i class="fa fa-star" style="color:rgb(207, 196, 196) !important;"></i>
+                            <i class="fa fa-star" style="color:rgb(207, 196, 196) !important;"></i>
+                            <i class="fa fa-star" style="color: rgb(207, 196, 196) !important;"></i>';
+                        } else if($full_rating == 3){
+                            $rate = '<i class="fa fa-star" style="color:yellow !important;"></i>
+                            <i class="fa fa-star" style="color:yellow !important;"></i>
+                            <i class="fa fa-star" style="color:yellow !important;"></i>
+                            <i class="fa fa-star" style="color:rgb(207, 196, 196) !important;"></i>
+                            <i class="fa fa-star" style="color: rgb(207, 196, 196) !important;"></i>';
+                        } else if($full_rating == 4){
+                            $rate = '<i class="fa fa-star" style="color:yellow !important;"></i>
+                            <i class="fa fa-star" style="color:yellow !important;"></i>
+                            <i class="fa fa-star" style="color:yellow !important;"></i>
+                            <i class="fa fa-star" style="color:yellow !important;"></i>
+                            <i class="fa fa-star" style="color: rgb(207, 196, 196) !important;"></i>';
+                        } else  {
+                            $rate = '<i class="fa fa-star" style="color:yellow !important;"></i>
+                            <i class="fa fa-star" style="color:yellow !important;"></i>
+                            <i class="fa fa-star" style="color:yellow !important;"></i>
+                            <i class="fa fa-star" style="color:yellow !important;"></i>
+                            <i class="fa fa-star" style="color:yellow !important;"></i>';
+                        }
+                   } else {
+                       $sp_name = '';
+                       $rating = '';
+                       $rate = '';
+                   }
+
+                   if($servicestatus == 'Completed'){
+                       $modal = '<a href="#" data-toggle="modal" data-target="#ratingmodal">
+                       <button class="btn btn-primary rating">RateSP</button>';
+                   } else {
+                       $modal = '
+                       <button class="btn btn-primary rating disabled">RateSP</button>';
+                   }
+                    $output = '<tr name="'.$servicereqid.'">
                     
                     <td>
                     
                     <img src="./assets/image/calendar.png" alt="calender"> '.$servicedate.' <br>
-                    <img src="./assets/image/layer-712.png" alt="clock"> '.$servicehour.' hrs.
+                    <img src="./assets/image/layer-712.png" alt="clock"> '.$stime.'-'.$var1.':'.$min.' '.$var2.'
                     </td>
-                    <td>
-                        
+                    <td class="spname">
+                        '.$sp_name.' <br> '.$rate.'
                     </td>
                     <td>
                     <i class="fas fa-dollar-sign"></i><span>'.$payment.'</span>
                     </td>
                     <td>
                       <h6 class="text-dark font-weight-bold">'.$servicestatus.'</h6>
-                      
-                    </td>
-                    <td class="rate" id="'.$serviceid.'">
-                      <a href="#" data-toggle="modal" data-target="#ratingmodal">
-                      <button class="btn btn-primary rating">RateSP</button>
                       <input type="hidden" id="records" value="'.$count.'"></a>
                       
+                    </td>
+                    <td class="rate" name="'.$servicereqid.'">
+                       '.$modal.'
                     </td>
                 </tr>
                 ';
@@ -682,6 +810,16 @@ class HelperlandController
         }
     }
 
+    public function spname()
+    {
+        if(isset($_POST))
+        {
+            $sp_id = $_POST['id'];
+            $result = $this->model->spname($sp_id);
+            echo $result;
+        }
+    }
+
     public function rating()
     {
         if(isset($_POST))
@@ -703,12 +841,21 @@ class HelperlandController
                 'comment' => $comment,
                 'ratingdate' => date('Y-m-d H:i:s'),
             ];
-            $result = $this->model->rating($array);
-            if($result){
-                echo '1';
-            } else {
-                echo '0';
+
+            $check_rating = $this->model->check_rating($reqid);
+
+            if($check_rating == 1){
+                echo '2';
+            } else{
+                $result = $this->model->rating($array);
+                if($result){
+                    echo '1';
+                } else {
+                    echo '0';
+                }
             }
+
+            
         }
     }
 
@@ -806,7 +953,8 @@ class HelperlandController
         {
             $servicereqid = $_POST['servicereqid'];
             $newdate = $_POST['newdate'];
-            $rest = $this->model->reschedulerequest($servicereqid,$newdate);
+            $newtime = $_POST['newtime'];
+            $rest = $this->model->reschedulerequest($servicereqid,$newdate,$newtime);
             if($rest == 1){
                 echo ($servicereqid);
             } else{
@@ -832,20 +980,52 @@ class HelperlandController
                     $address_1 = $row['AddressLine1'];
                     $address_2 = $row['AddressLine2'];
                     $payment = $row['TotalCost'];
+                    $sp_id  = $row['ServiceProviderId'];
                     $count = count($result);
+                    $stime = $row['ServiceStartTime'];
+                    $endtime = intval($stime)  + $hour;
+                    if($endtime >= 12){
+                        $pm = 1;
+                        $dummy = $endtime - 12;
+                        $var1 = intval($dummy);
+                        $min = $dummy - $var1;
+                          if($min == 0.5){
+                              $min = 30;
+                          } else{
+                              $min = 00;
+                          }
+                        
+                    } else{
+                        $pm = 0;
+                        $dummy = $endtime;
+                        $var1 = intval($dummy);
+                        $min = $dummy - $var1;
+                          if($min == 0.5){
+                              $min = 30;
+                          } else{
+                              $min = 00;
+                          }
+                    }
+
+                    if($pm == 1){
+                        $var2 = "PM";
+                    } else{
+                        $var2 = "AM";
+                    }
+                    
 
                     $output ='<tr name="'.$servicereqid.'">
                     <td>'.$serviceid.'</td>
                     <td><img src="./assets/image/calendar2.png" alt=""> '.$date.'<br>
-                        <img src="./assets/image/layer-712.png" alt=""> '.$hour.'
+                    <img src="./assets/image/layer-712.png" alt="clock"> '.$stime.'-'.$var1.':'.$min.' '.$var2.'
                     </td>
                     <td>'.$fname.'&nbsp;'.$lname.' <br>
                         <img src="./assets/image/layer-719.png" alt=""> '.$address_1.' &nbsp; '.$address_2.'
                     </td>
                     <td><i class="fas fa-dollar-sign"></i> '.$payment.'</td>
-                    <td>Time Conflict</td>
+                    <td class="conflict-'.$servicereqid.'"></td>
                     <td>
-                    <button class="btn btn-primary open-btn" style="background-color : blue !important"
+                    <button class="btn btn-primary open-btn" data-path="'.$date.'" style="background-color : blue !important"
                     data-toggle="modal" data-target="#acceptrequestmodal">Accept</button> 
                     <input type="hidden" id="records" value="'.$count.'">
                     </td>
@@ -873,9 +1053,43 @@ class HelperlandController
                     $address_1 = $row['AddressLine1'];
                     $address_2 = $row['AddressLine2'];
                     $payment = $row['TotalCost'];
+                    $sp_id  = $row['ServiceProviderId'];
+                    $stime = $row['ServiceStartTime'];
+                    $endtime = intval($stime)  + $hour;
+                    if($endtime >= 12){
+                        $pm = 1;
+                        $dummy = $endtime - 12;
+                        $var1 = intval($dummy);
+                        $min = $dummy - $var1;
+                          if($min == 0.5){
+                              $min = 30;
+                          } else{
+                              $min = 00;
+                          }
+                        
+                    } else{
+                        $pm = 0;
+                        $dummy = $endtime;
+                        $var1 = intval($dummy);
+                        $min = $dummy - $var1;
+                          if($min == 0.5){
+                              $min = 30;
+                          } else{
+                              $min = 00;
+                          }
+                    }
+
+                    if($pm == 1){
+                        $var2 = "PM";
+                    } else{
+                        $var2 = "AM";
+                    }
+
+
+                    
 
                     $output = '<h2>'.$date.'</h2>
-                    <span class="text-secondary font-weight-bold">Duration : </span>&nbsp; <span>'.$hour.' hrs.</span>
+                    <span class="text-secondary font-weight-bold">Duration : </span>&nbsp; <span>'.$stime.'-'.$var1.':'.$min.' '.$var2.'</span>
                     <hr>
                     <span class="text-secondary font-weight-bold">Service Id :</span>&nbsp;<span>'.$serviceid.'</span>
                     <br>
@@ -903,13 +1117,21 @@ class HelperlandController
         if(isset($_POST))
         {
             $req_id = $_POST['reqid'];
+            $date = $_POST['date'];
             $sp_id = $_POST['id'];
-            $result = $this->model->acceptrequest($req_id,$sp_id);
-            if($result == 1){
-                echo 1;
-            } else {
-                echo 0;
+            $conflict = $this->model->timeconflict($sp_id,$date);
+            if($conflict >= 1){
+                echo 2;
+            } else{
+                 $result = $this->model->acceptrequest($req_id,$sp_id);
+                  if($result == 1){
+                       echo 1;
+                  } else {
+                       echo 0;
+                  } 
             }
+
+            
 
         }
     }
@@ -932,11 +1154,42 @@ class HelperlandController
                     $address_2 = $row['AddressLine2'];
                     $payment = $row['TotalCost'];
                     $count = count($result);
+                    $stime = $row['ServiceStartTime'];
+                    $endtime = intval($stime)  + $hour;
+                    if($endtime >= 12){
+                        $pm = 1;
+                        $dummy = $endtime - 12;
+                        $var1 = intval($dummy);
+                        $min = $dummy - $var1;
+                          if($min == 0.5){
+                              $min = 30;
+                          } else{
+                              $min = 00;
+                          }
+                        
+                    } else{
+                        $pm = 0;
+                        $dummy = $endtime;
+                        $var1 = intval($dummy);
+                        $min = $dummy - $var1;
+                          if($min == 0.5){
+                              $min = 30;
+                          } else{
+                              $min = 00;
+                          }
+                    }
+
+                    if($pm == 1){
+                        $var2 = "PM";
+                    } else{
+                        $var2 = "AM";
+                    }
+
 
                     $output ='<tr name="'.$servicereqid.'">
                     <td data-toggle="modal" data-target="#showdatamodal">'.$serviceid.'</td>
                     <td data-toggle="modal" data-target="#showdatamodal"><img src="./assets/image/calendar2.png" alt=""> '.$date.'<br>
-                        <img src="./assets/image/layer-712.png" alt=""> '.$hour.'
+                    <img src="./assets/image/layer-712.png" alt="clock"> '.$stime.'-'.$var1.':'.$min.' '.$var2.'
                     </td>
                     <td data-toggle="modal" data-target="#showdatamodal">'.$fname.'&nbsp;'.$lname.' <br>
                         <img src="./assets/image/layer-719.png" alt=""> '.$address_1.' &nbsp; '.$address_2.'
@@ -973,13 +1226,44 @@ class HelperlandController
                     $address_2 = $row['AddressLine2'];
                     $payment = $row['TotalCost'];
                     $count = count($result);
+                    $stime = $row['ServiceStartTime'];
+                    $endtime = intval($stime)  + $hour;
+                    if($endtime >= 12){
+                        $pm = 1;
+                        $dummy = $endtime - 12;
+                        $var1 = intval($dummy);
+                        $min = $dummy - $var1;
+                          if($min == 0.5){
+                              $min = 30;
+                          } else{
+                              $min = 00;
+                          }
+                        
+                    } else{
+                        $pm = 0;
+                        $dummy = $endtime;
+                        $var1 = intval($dummy);
+                        $min = $dummy - $var1;
+                          if($min == 0.5){
+                              $min = 30;
+                          } else{
+                              $min = 00;
+                          }
+                    }
+
+                    if($pm == 1){
+                        $var2 = "PM";
+                    } else{
+                        $var2 = "AM";
+                    }
+                    
 
                     $output ='<tr name="'.$servicereqid.'">
                     <td>'.$serviceid.'
                     <input type="hidden" id="records" value="'.$count.'">
                     </td>
                     <td><img src="./assets/image/calendar2.png" alt=""> '.$date.'<br>
-                        <img src="./assets/image/layer-712.png" alt=""> '.$hour.'
+                       <img src="./assets/image/layer-712.png" alt="clock"> '.$stime.'-'.$var1.':'.$min.' '.$var2.'
                     </td>
                     <td>'.$fname.'&nbsp;'.$lname.' <br>
                         <img src="./assets/image/layer-719.png" alt=""> '.$address_1.' &nbsp; '.$address_2.'
@@ -989,15 +1273,6 @@ class HelperlandController
                 echo ($output);
                 }
             }
-        }
-    }
-
-    public function showdata()
-    {
-        if(isset($_POST))
-        {
-            $req_id = $_POST['id'];
-            // This is used further for showing map
         }
     }
 
@@ -1046,8 +1321,9 @@ class HelperlandController
                     $code = $row['zip'];
                     $city = $row['City'];
                     $gender = $row['Gender'];
+                    $img = $row['UserProfilePicture'];
 
-                    $output = [$fname,$lname,$email,$mobile,$dob,$nation,$sname,$houseno,$code,$city,$gender];
+                    $output = [$fname,$lname,$email,$mobile,$dob,$nation,$sname,$houseno,$code,$city,$gender,$img];
 
                     echo json_encode($output);
                 }
@@ -1070,6 +1346,7 @@ class HelperlandController
             $houseno = $_POST['houseno'];
             $city = $_POST['city'];
             $code = $_POST['code'];
+            $img = $_POST['img'];
 
             $array1 = [
                 'sp_id' => $sp_id,
@@ -1079,6 +1356,8 @@ class HelperlandController
                 'dob' => $dob,
                 'gender' => $gender,
                 'nation' => $nation,
+                'code' => $code,
+                'img' => $img,
             ];
             $result1 = $this->model->updatespdetails($array1);
 
@@ -1181,9 +1460,39 @@ class HelperlandController
                     $fname = $row['FirstName'];
                     $lname = $row['LastName'];
                     $date = $row['ServiceDate'];
-                    $time = $row['ServiceHours'];
+                    $hour = $row['ServiceHours'];
                     $rating = $row['Ratings'];
                     $comment = $row['Comments'];
+                    $stime = $row['ServiceStartTime'];
+                    $endtime = intval($stime)  + $hour;
+                    if($endtime >= 12){
+                        $pm = 1;
+                        $dummy = $endtime - 12;
+                        $var1 = intval($dummy);
+                        $min = $dummy - $var1;
+                          if($min == 0.5){
+                              $min = 30;
+                          } else{
+                              $min = 00;
+                          }
+                        
+                    } else{
+                        $pm = 0;
+                        $dummy = $endtime;
+                        $var1 = intval($dummy);
+                        $min = $dummy - $var1;
+                          if($min == 0.5){
+                              $min = 30;
+                          } else{
+                              $min = 00;
+                          }
+                    }
+
+                    if($pm == 1){
+                        $var2 = "PM";
+                    } else{
+                        $var2 = "AM";
+                    }
  
                     if($rating == 1){
                         $rate = '<i class="fa fa-star" style="color:yellow !important;"></i>
@@ -1230,8 +1539,7 @@ class HelperlandController
                               <img src="./assets/image/calendar2.png" alt="cal">    
                               '.$date.'</p>
                               <p class="text-secondary">
-                              <img src="./assets/image/layer-712.png" alt="time">    
-                              '.$time.'</p>
+                              <img src="./assets/image/layer-712.png" alt="clock"> '.$stime.'-'.$var1.':'.$min.' '.$var2.'</p>
                         </div>
                         <div class="col-md-5 ml-2 mt-2">
                             <p class="text-center text-secondary font-weight-bold">rating : '.$rating.'</p>
@@ -1250,6 +1558,1282 @@ class HelperlandController
 
                     echo $output;
                 }
+            }
+        }
+    }
+
+    public function getAllUserDetails()
+    {
+        if(isset($_POST))
+        {
+            $admin_id = $_POST['id'];
+            $result = $this->model->getAllUserDetails($admin_id);
+            if($result){
+                foreach($result as $row){
+                    $userid = $row['UserId'];
+                    $fname = $row['FirstName'];
+                    $lname = $row['LastName'];
+                    $mobile = $row['Mobile'];
+                    $zipcode = $row['ZipCode'];
+                    $date = $row['CreatedDate'];
+                    $usertype = $row['UserTypeId'];
+                    $active = $row['IsActive'];
+
+                    if($usertype == 1){
+                        $user_type = "Customer";
+                    } else{
+                        $user_type = "Service Provider";
+                    }
+
+                    if($active == 0){
+                        $status = '<p class="success font-weight-bold text-light text-center" name="'.$userid.'">Active</p>';
+                    } else{
+                        $status = '<p class="fail font-weight-bold text-light text-center" name="'.$userid.'">Inactive</p>';
+                    }
+
+                    $output = '<tr>
+                    <td>'.$fname.' '.$lname.'</td>
+                    <td> '.$user_type.' </td>
+                    <td><img src="./assets/image/calendar2.png" alt="cal">'.$date.'</td>
+                    <td>'.$mobile.'</td>
+                    <td>'.$zipcode.'</td>
+                    <td class="'.$active.'">'.$status.'</td>    
+                    <td><img src="./assets/image/icon-more.png"></td>
+                  </tr>
+                  
+                  ';
+
+                  echo ($output);
+                }
+            }
+        }
+    }
+
+    public function searchbyUsername()
+    {
+        if(isset($_POST))
+        {
+            $admin_id = $_POST['id'];
+            $username = $_POST['username'];
+            $result = $this->model->searchbyUsername($username,$admin_id);
+            if($result){
+                    foreach ($result as $row){
+                        $fname = $row['FirstName'];
+                        $lname = $row['LastName'];
+                        $mobile = $row['Mobile'];
+                        $zipcode = $row['ZipCode'];
+                        $date = $row['CreatedDate'];
+                        $usertype = $row['UserTypeId'];
+                        $active = $row['IsActive'];
+    
+                        if($usertype == 1){
+                            $user_type = "Customer";
+                        } else{
+                            $user_type = "Service Provider";
+                        }
+    
+                        if($active == 0){
+                            $status = '<p class="success">Active</p>';
+                        } else{
+                            $status = '<p class="fail">Inactive</p>';
+                        }
+    
+                        $output = '<tr>
+                        <td>'.$fname.' '.$lname.'</td>
+                        <td> '.$user_type.' </td>
+                        <td><img src="./assets/image/calendar2.png" alt="cal">'.$date.'</td>
+                        <td>'.$mobile.'</td>
+                        <td>'.$zipcode.'</td>
+                        <td>'.$status.'</td>    
+                        <td>:</td>
+                      </tr>
+                      
+                      ';
+    
+                      echo ($output); 
+                    }
+            } else {
+                $output = '<h3 class="text-center"> No records found</h3>';
+                echo $output;
+            }
+        }
+    }
+
+    public function searchbyPhone()
+    {
+        if(isset($_POST))
+        {
+            $admin_id = $_POST['id'];
+            $phone = $_POST['phone'];
+            $result = $this->model->searchbyPhone($phone,$admin_id);
+            if($result){
+                    foreach ($result as $row){
+                        $fname = $row['FirstName'];
+                        $lname = $row['LastName'];
+                        $mobile = $row['Mobile'];
+                        $zipcode = $row['ZipCode'];
+                        $date = $row['CreatedDate'];
+                        $usertype = $row['UserTypeId'];
+                        $active = $row['IsActive'];
+    
+                        if($usertype == 1){
+                            $user_type = "Customer";
+                        } else{
+                            $user_type = "Service Provider";
+                        }
+    
+                        if($active == 0){
+                            $status = '<p class="success">Active</p>';
+                        } else{
+                            $status = '<p class="fail">Inactive</p>';
+                        }
+    
+                        $output = '<tr>
+                        <td>'.$fname.' '.$lname.'</td>
+                        <td> '.$user_type.' </td>
+                        <td><img src="./assets/image/calendar2.png" alt="cal">'.$date.'</td>
+                        <td>'.$mobile.'</td>
+                        <td>'.$zipcode.'</td>
+                        <td>'.$status.'</td>    
+                        <td>:</td>
+                      </tr>
+                      
+                      ';
+    
+                      echo ($output); 
+                    }
+            } else {
+                $output = '<h3 class="text-center"> No records found</h3>';
+                echo $output;
+            }
+        }
+    }
+
+    public function searchbyCode()
+    {
+        if(isset($_POST))
+        {
+            $admin_id = $_POST['id'];
+            $code = $_POST['code'];
+            $result = $this->model->searchbyCode($code,$admin_id);
+            if($result){
+                    foreach ($result as $row){
+                        $fname = $row['FirstName'];
+                        $lname = $row['LastName'];
+                        $mobile = $row['Mobile'];
+                        $zipcode = $row['ZipCode'];
+                        $date = $row['CreatedDate'];
+                        $usertype = $row['UserTypeId'];
+                        $active = $row['IsActive'];
+    
+                        if($usertype == 1){
+                            $user_type = "Customer";
+                        } else{
+                            $user_type = "Service Provider";
+                        }
+    
+                        if($active == 0){
+                            $status = '<p class="success">Active</p>';
+                        } else{
+                            $status = '<p class="fail">Inactive</p>';
+                        }
+    
+                        $output = '<tr>
+                        <td>'.$fname.' '.$lname.'</td>
+                        <td> '.$user_type.' </td>
+                        <td><img src="./assets/image/calendar2.png" alt="cal">'.$date.'</td>
+                        <td>'.$mobile.'</td>
+                        <td>'.$zipcode.'</td>
+                        <td>'.$status.'</td>    
+                        <td>:</td>
+                      </tr>
+                      
+                      ';
+    
+                      echo ($output); 
+                    }
+            } else {
+                $output = '<h3 class="text-center"> No records found</h3>';
+                echo $output;
+            }
+        }
+    }
+    public function searchbyUserType()
+    {
+        if(isset($_POST))
+        {
+            $admin_id = $_POST['id'];
+            $type = $_POST['typeid'];
+            $result = $this->model->searchbyUserType($type,$admin_id);
+            if($result){
+                    foreach ($result as $row){
+                        $fname = $row['FirstName'];
+                        $lname = $row['LastName'];
+                        $mobile = $row['Mobile'];
+                        $zipcode = $row['ZipCode'];
+                        $date = $row['CreatedDate'];
+                        $usertype = $row['UserTypeId'];
+                        $active = $row['IsActive'];
+    
+                        if($usertype == 1){
+                            $user_type = "Customer";
+                        } else{
+                            $user_type = "Service Provider";
+                        }
+    
+                        if($active == 0){
+                            $status = '<p class="success">Active</p>';
+                        } else{
+                            $status = '<p class="fail">Inactive</p>';
+                        }
+    
+                        $output = '<tr>
+                        <td>'.$fname.' '.$lname.'</td>
+                        <td> '.$user_type.' </td>
+                        <td><img src="./assets/image/calendar2.png" alt="cal">'.$date.'</td>
+                        <td>'.$mobile.'</td>
+                        <td>'.$zipcode.'</td>
+                        <td>'.$status.'</td>    
+                        <td>:</td>
+                      </tr>
+                      
+                      ';
+    
+                      echo ($output); 
+                    }
+            } else {
+                $output = '<h3 class="text-center"> No records found</h3>';
+                echo $output;
+            }
+        }
+    }
+
+    public function changestatus()
+    {
+        if(isset($_POST))
+        {
+            $id = $_POST['id'];
+            $status = $_POST['status'];
+            $result = $this->model->changestatus($id,$status);
+            if($result){
+                echo 1;
+            } else{
+                echo 0;
+            }
+        }
+    }
+
+    public function getAllServiceDetails()
+    {
+        if(isset($_POST))
+        {
+            $admin_id = $_POST['id'];
+            $result = $this->model->getAllServiceDetails($admin_id);
+            if($result){
+                foreach($result as $row){
+                    $servicereqid = $row['ServiceRequestId'];
+                    $serviceid = $row['ServiceId'];
+                    $date = $row['ServiceDate'];
+                    $hour = $row['ServiceHours'];
+                    $fname = $row['FirstName'];
+                    $lname = $row['LastName'];
+                    $address_1 = $row['AddressLine1'];
+                    $address_2 = $row['AddressLine2'];
+                    $payment = $row['TotalCost'];
+                    $status = $row['Status'];
+                    $spname = $row['ServiceProviderId'];
+                    $count = count($result);
+                    $stime = $row['ServiceStartTime'];
+                    $endtime = intval($stime)  + $hour;
+                    if($endtime >= 12){
+                        $pm = 1;
+                        $dummy = $endtime - 12;
+                        $var1 = intval($dummy);
+                        $min = $dummy - $var1;
+                          if($min == 0.5){
+                              $min = 30;
+                          } else{
+                              $min = 00;
+                          }
+                        
+                    } else{
+                        $pm = 0;
+                        $dummy = $endtime;
+                        $var1 = intval($dummy);
+                        $min = $dummy - $var1;
+                          if($min == 0.5){
+                              $min = 30;
+                          } else{
+                              $min = 00;
+                          }
+                    }
+
+                    if($pm == 1){
+                        $var2 = "PM";
+                    } else{
+                        $var2 = "AM";
+                    }
+                    if($spname != ''){
+                        $sp_name = $this->model->GetSP($servicereqid);
+
+                   } else {
+                       $sp_name = '';
+                   }
+                    
+
+                    if(($status == 'Pending') || ($status == 'Assigned')){
+                        $set_status = '<p class="pending">'.$status.'</p>';
+                        $action = '<a href="#" data-toggle="dropdown"><img src="./assets/image/icon-more.png"> </a>
+                        <div class="dropdown-menu">
+                            <a href="#" class="dropdown-item edit-reschedule">Edit & Reschedule</a>
+                            <a href="#" class="dropdown-item">Refund</a>
+                            <a href="#" class="dropdown-item">Cancel</a>
+                            <a href="#" class="dropdown-item">Change SP</a>
+                            <a href="#" class="dropdown-item">Escalate</a>
+                            <a href="#" class="dropdown-item">History Log</a>
+                            <a href="#" class="dropdown-item">Download Invoices</a>
+                        </div>';
+                    } else if($status == 'Completed'){
+                        
+                        $set_status = '<p class="success">Completed</p>';
+                        $action = '<a href="#" data-toggle="dropdown"><img src="./assets/image/icon-more.png"> </a>
+                        <div class="dropdown-menu">
+                            <a href="#" class="dropdown-item">Refund</a>
+                            <a href="#" class="dropdown-item">Escalate</a>
+                            <a href="#" class="dropdown-item">History Log</a>
+                            <a href="#" class="dropdown-item">Download Invoices</a>
+                        </div>';
+                    } else {
+                        $set_status = '<p class="new">'.$status.'</p>';
+                        $action = '<a href="#"><img src="./assets/image/icon-more.png"></a>';
+                    }
+
+                    $output ='<tr class="'.$servicereqid.'">
+                    <td>'.$serviceid.'</td>
+                    <td><img src="./assets/image/calendar2.png" alt=""> '.$date.' <br>
+                    <img src="./assets/image/layer-712.png" alt="clock"> '.$stime.'-'.$var1.':'.$min.' '.$var2.'
+                    </td>
+                    <td> '.$fname.' '.$lname.'  <br>
+                        <img src="./assets/image/layer-719.png" alt=""> '.$address_1.' '.$address_2.'
+                    </td>
+                    <td>
+                        '.$sp_name.'
+                    </td>
+                    <td><i class="fas fa-dollar-sign"></i>'.$payment.'</td>
+                    <td>'.$set_status.'</td>
+                    <td class="text-center dropdown">'.$action.'</td>
+              </tr>';
+
+                echo ($output);
+                }
+            }
+        }
+    }
+
+    public function searchbyServiceId()
+    {
+        if(isset($_POST))
+        {
+            $service_id = $_POST['serviceid'];
+            $result = $this->model->searchbyServiceId($service_id);
+            if($result){
+                foreach($result as $row){
+                    $servicereqid = $row['ServiceRequestId'];
+                    $serviceid = $row['ServiceId'];
+                    $date = $row['ServiceDate'];
+                    $hour = $row['ServiceHours'];
+                    $fname = $row['FirstName'];
+                    $lname = $row['LastName'];
+                    $address_1 = $row['AddressLine1'];
+                    $address_2 = $row['AddressLine2'];
+                    $payment = $row['TotalCost'];
+                    $status = $row['Status'];
+                    $count = count($result);
+                    $stime = $row['ServiceStartTime'];
+                    $endtime = intval($stime)  + $hour;
+                    if($endtime >= 12){
+                        $pm = 1;
+                        $dummy = $endtime - 12;
+                        $var1 = intval($dummy);
+                        $min = $dummy - $var1;
+                          if($min == 0.5){
+                              $min = 30;
+                          } else{
+                              $min = 00;
+                          }
+                        
+                    } else{
+                        $pm = 0;
+                        $dummy = $endtime;
+                        $var1 = intval($dummy);
+                        $min = $dummy - $var1;
+                          if($min == 0.5){
+                              $min = 30;
+                          } else{
+                              $min = 00;
+                          }
+                    }
+
+                    if($pm == 1){
+                        $var2 = "PM";
+                    } else{
+                        $var2 = "AM";
+                    }
+
+                    if(($status == 'Pending') || ($status == 'Assigned')){
+                        $set_status = '<p class="pending">'.$status.'</p>';
+                        $action = '<a href="#" data-toggle="dropdown"><img src="./assets/image/icon-more.png"> </a>
+                        <div class="dropdown-menu">
+                            <a href="#" class="dropdown-item">Edit & Reschedule</a>
+                            <a href="#" class="dropdown-item">Refund</a>
+                            <a href="#" class="dropdown-item">Cancel</a>
+                            <a href="#" class="dropdown-item">Change SP</a>
+                            <a href="#" class="dropdown-item">Escalate</a>
+                            <a href="#" class="dropdown-item">History Log</a>
+                            <a href="#" class="dropdown-item">Download Invoices</a>
+                        </div>';
+                    } else if($status == 'Completed'){
+                        $set_status = '<p class="success">Completed</p>';
+                        $action = '<a href="#" data-toggle="dropdown"><img src="./assets/image/icon-more.png"> </a>
+                        <div class="dropdown-menu">
+                            <a href="#" class="dropdown-item">Refund</a>
+                            <a href="#" class="dropdown-item">Escalate</a>
+                            <a href="#" class="dropdown-item">History Log</a>
+                            <a href="#" class="dropdown-item">Download Invoices</a>
+                        </div>';
+                    } else {
+                        $set_status = '<p class="new">'.$status.'</p>';
+                        $action = '<a href="#"><img src="./assets/image/icon-more.png"> </a>';
+                    }
+
+                    $output ='<tr>
+                    <td>'.$serviceid.'</td>
+                    <td><img src="./assets/image/calendar2.png" alt=""> '.$date.' <br>
+                    <img src="./assets/image/layer-712.png" alt="clock"> '.$stime.'-'.$var1.':'.$min.' '.$var2.'
+                    </td>
+                    <td> '.$fname.' '.$lname.'  <br>
+                        <img src="./assets/image/layer-719.png" alt=""> '.$address_1.' '.$address_2.'
+                    </td>
+                    <td>
+                        
+                    </td>
+                    <td><i class="fas fa-dollar-sign"></i>'.$payment.'</td>
+                    <td>'.$set_status.'</td>
+                    <td class="text-center dropdown">'.$action.'</td>
+                  </tr>';
+
+                   echo ($output);
+                }
+            }  else{
+                $output = '<h3 class="text-center"> No records found</h3>';
+                echo $output;
+            }
+        }
+    }
+    public function searchbyStatus()
+    {
+        if(isset($_POST))
+        {
+            $status = $_POST['status'];
+            $result = $this->model->searchbyStatus($status);
+            if($result){
+                foreach($result as $row){
+                    $servicereqid = $row['ServiceRequestId'];
+                    $serviceid = $row['ServiceId'];
+                    $date = $row['ServiceDate'];
+                    $hour = $row['ServiceHours'];
+                    $fname = $row['FirstName'];
+                    $lname = $row['LastName'];
+                    $address_1 = $row['AddressLine1'];
+                    $address_2 = $row['AddressLine2'];
+                    $payment = $row['TotalCost'];
+                    $status = $row['Status'];
+                    $count = count($result);
+                    $stime = $row['ServiceStartTime'];
+                    $endtime = intval($stime)  + $hour;
+                    if($endtime >= 12){
+                        $pm = 1;
+                        $dummy = $endtime - 12;
+                        $var1 = intval($dummy);
+                        $min = $dummy - $var1;
+                          if($min == 0.5){
+                              $min = 30;
+                          } else{
+                              $min = 00;
+                          }
+                        
+                    } else{
+                        $pm = 0;
+                        $dummy = $endtime;
+                        $var1 = intval($dummy);
+                        $min = $dummy - $var1;
+                          if($min == 0.5){
+                              $min = 30;
+                          } else{
+                              $min = 00;
+                          }
+                    }
+
+                    if($pm == 1){
+                        $var2 = "PM";
+                    } else{
+                        $var2 = "AM";
+                    }
+
+                    if(($status == 'Pending') || ($status == 'Assigned')){
+                        $set_status = '<p class="pending">'.$status.'</p>';
+                        $action = '<a href="#" data-toggle="dropdown"><img src="./assets/image/icon-more.png"></a>
+                        <div class="dropdown-menu">
+                            <a href="#" class="dropdown-item">Edit & Reschedule</a>
+                            <a href="#" class="dropdown-item">Refund</a>
+                            <a href="#" class="dropdown-item">Cancel</a>
+                            <a href="#" class="dropdown-item">Change SP</a>
+                            <a href="#" class="dropdown-item">Escalate</a>
+                            <a href="#" class="dropdown-item">History Log</a>
+                            <a href="#" class="dropdown-item">Download Invoices</a>
+                        </div>';
+                    } else if($status == 'Completed'){
+                        $set_status = '<p class="success">Completed</p>';
+                        $action = '<a href="#" data-toggle="dropdown"><img src="./assets/image/icon-more.png"> </a>
+                        <div class="dropdown-menu">
+                            <a href="#" class="dropdown-item">Refund</a>
+                            <a href="#" class="dropdown-item">Escalate</a>
+                            <a href="#" class="dropdown-item">History Log</a>
+                            <a href="#" class="dropdown-item">Download Invoices</a>
+                        </div>';
+                    } else {
+                        $set_status = '<p class="new">'.$status.'</p>';
+                        $action = '<a href="#"><img src="./assets/image/icon-more.png"></a>';
+                    }
+
+                    $output ='<tr>
+                    <td>'.$serviceid.'</td>
+                    <td><img src="./assets/image/calendar2.png" alt=""> '.$date.' <br>
+                    <img src="./assets/image/layer-712.png" alt="clock"> '.$stime.'-'.$var1.':'.$min.' '.$var2.'
+                    </td>
+                    <td> '.$fname.' '.$lname.'  <br>
+                        <img src="./assets/image/layer-719.png" alt=""> '.$address_1.' '.$address_2.'
+                    </td>
+                    <td>
+                        
+                    </td>
+                    <td><i class="fas fa-dollar-sign"></i>'.$payment.'</td>
+                    <td>'.$set_status.'</td>
+                    <td class="text-center dropdown">'.$action.'</td>
+                  </tr>';
+
+                   echo ($output);
+                }
+            }  else{
+                $output = '<h3 class="text-center"> No records found</h3>';
+                echo $output;
+            }
+        }
+    }
+
+    public function searchbyEmail()
+    {
+        if(isset($_POST))
+        {
+            $email = $_POST['email'];
+            $result = $this->model->searchbyEmail($email);
+            if($result){
+                foreach($result as $row){
+                    $servicereqid = $row['ServiceRequestId'];
+                    $serviceid = $row['ServiceId'];
+                    $date = $row['ServiceDate'];
+                    $hour = $row['ServiceHours'];
+                    $fname = $row['FirstName'];
+                    $lname = $row['LastName'];
+                    $address_1 = $row['AddressLine1'];
+                    $address_2 = $row['AddressLine2'];
+                    $payment = $row['TotalCost'];
+                    $status = $row['Status'];
+                    $count = count($result);
+                    $stime = $row['ServiceStartTime'];
+                    $endtime = intval($stime)  + $hour;
+                    if($endtime >= 12){
+                        $pm = 1;
+                        $dummy = $endtime - 12;
+                        $var1 = intval($dummy);
+                        $min = $dummy - $var1;
+                          if($min == 0.5){
+                              $min = 30;
+                          } else{
+                              $min = 00;
+                          }
+                        
+                    } else{
+                        $pm = 0;
+                        $dummy = $endtime;
+                        $var1 = intval($dummy);
+                        $min = $dummy - $var1;
+                          if($min == 0.5){
+                              $min = 30;
+                          } else{
+                              $min = 00;
+                          }
+                    }
+
+                    if($pm == 1){
+                        $var2 = "PM";
+                    } else{
+                        $var2 = "AM";
+                    }
+
+                    if(($status == 'Pending') || ($status == 'Assigned')){
+                        $set_status = '<p class="pending">'.$status.'</p>';
+                        $action = '<a href="#" data-toggle="dropdown"><img src="./assets/image/icon-more.png"></a>
+                        <div class="dropdown-menu">
+                            <a href="#" class="dropdown-item">Edit & Reschedule</a>
+                            <a href="#" class="dropdown-item">Refund</a>
+                            <a href="#" class="dropdown-item">Cancel</a>
+                            <a href="#" class="dropdown-item">Change SP</a>
+                            <a href="#" class="dropdown-item">Escalate</a>
+                            <a href="#" class="dropdown-item">History Log</a>
+                            <a href="#" class="dropdown-item">Download Invoices</a>
+                        </div>';
+                    } else if($status == 'Completed'){
+                        $set_status = '<p class="success">Completed</p>';
+                        $action = '<a href="#" data-toggle="dropdown"><img src="./assets/image/icon-more.png"> </a>
+                        <div class="dropdown-menu">
+                            <a href="#" class="dropdown-item">Refund</a>
+                            <a href="#" class="dropdown-item">Escalate</a>
+                            <a href="#" class="dropdown-item">History Log</a>
+                            <a href="#" class="dropdown-item">Download Invoices</a>
+                        </div>';
+                    } else {
+                        $set_status = '<p class="new">'.$status.'</p>';
+                        $action = '<a href="#"><img src="./assets/image/icon-more.png"></a>';
+                    }
+
+                    $output ='<tr>
+                    <td>'.$serviceid.'</td>
+                    <td><img src="./assets/image/calendar2.png" alt=""> '.$date.' <br>
+                    <img src="./assets/image/layer-712.png" alt="clock"> '.$stime.'-'.$var1.':'.$min.' '.$var2.'
+                    </td>
+                    <td> '.$fname.' '.$lname.'  <br>
+                        <img src="./assets/image/layer-719.png" alt=""> '.$address_1.' '.$address_2.'
+                    </td>
+                    <td>
+                        
+                    </td>
+                    <td><i class="fas fa-dollar-sign"></i>'.$payment.'</td>
+                    <td>'.$set_status.'</td>
+                    <td class="text-center dropdown">'.$action.'</td>
+                  </tr>';
+
+                   echo ($output);
+                }
+            }  else{
+                $output = '<h3 class="text-center"> No records found</h3>';
+                echo $output;
+            }
+        }
+    }
+
+    public function searchbyPostalCode()
+    {
+        if(isset($_POST))
+        {
+            $code = $_POST['code'];
+            $result = $this->model->searchbyPostalCode($code);
+            if($result){
+                foreach($result as $row){
+                    $servicereqid = $row['ServiceRequestId'];
+                    $serviceid = $row['ServiceId'];
+                    $date = $row['ServiceDate'];
+                    $hour = $row['ServiceHours'];
+                    $fname = $row['FirstName'];
+                    $lname = $row['LastName'];
+                    $address_1 = $row['AddressLine1'];
+                    $address_2 = $row['AddressLine2'];
+                    $payment = $row['TotalCost'];
+                    $status = $row['Status'];
+                    $count = count($result);
+                    $stime = $row['ServiceStartTime'];
+                    $endtime = intval($stime)  + $hour;
+                    if($endtime >= 12){
+                        $pm = 1;
+                        $dummy = $endtime - 12;
+                        $var1 = intval($dummy);
+                        $min = $dummy - $var1;
+                          if($min == 0.5){
+                              $min = 30;
+                          } else{
+                              $min = 00;
+                          }
+                        
+                    } else{
+                        $pm = 0;
+                        $dummy = $endtime;
+                        $var1 = intval($dummy);
+                        $min = $dummy - $var1;
+                          if($min == 0.5){
+                              $min = 30;
+                          } else{
+                              $min = 00;
+                          }
+                    }
+
+                    if($pm == 1){
+                        $var2 = "PM";
+                    } else{
+                        $var2 = "AM";
+                    }
+
+                    if(($status == 'Pending') || ($status == 'Assigned')){
+                        $set_status = '<p class="pending">'.$status.'</p>';
+                        $action = '<a href="#" data-toggle="dropdown"><img src="./assets/image/icon-more.png"></a>
+                        <div class="dropdown-menu">
+                            <a href="#" class="dropdown-item">Edit & Reschedule</a>
+                            <a href="#" class="dropdown-item">Refund</a>
+                            <a href="#" class="dropdown-item">Cancel</a>
+                            <a href="#" class="dropdown-item">Change SP</a>
+                            <a href="#" class="dropdown-item">Escalate</a>
+                            <a href="#" class="dropdown-item">History Log</a>
+                            <a href="#" class="dropdown-item">Download Invoices</a>
+                        </div>';
+                    } else if($status == 'Completed'){
+                        $set_status = '<p class="success">Completed</p>';
+                        $action = '<a href="#" data-toggle="dropdown"><img src="./assets/image/icon-more.png"> </a>
+                        <div class="dropdown-menu">
+                            <a href="#" class="dropdown-item">Refund</a>
+                            <a href="#" class="dropdown-item">Escalate</a>
+                            <a href="#" class="dropdown-item">History Log</a>
+                            <a href="#" class="dropdown-item">Download Invoices</a>
+                        </div>';
+                    } else {
+                        $set_status = '<p class="new">'.$status.'</p>';
+                        $action = '<a href="#"><img src="./assets/image/icon-more.png"></a>';
+                    }
+
+                    $output ='<tr>
+                    <td>'.$serviceid.'</td>
+                    <td><img src="./assets/image/calendar2.png" alt=""> '.$date.' <br>
+                    <img src="./assets/image/layer-712.png" alt="clock"> '.$stime.'-'.$var1.':'.$min.' '.$var2.'
+                    </td>
+                    <td> '.$fname.' '.$lname.'  <br>
+                        <img src="./assets/image/layer-719.png" alt=""> '.$address_1.' '.$address_2.'
+                    </td>
+                    <td>
+                        
+                    </td>
+                    <td><i class="fas fa-dollar-sign"></i>'.$payment.'</td>
+                    <td>'.$set_status.'</td>
+                    <td class="text-center dropdown">'.$action.'</td>
+                  </tr>';
+
+                   echo ($output);
+                }
+            }  else{
+                $output = '<h3 class="text-center"> No records found</h3>';
+                echo $output;
+            }
+        }
+    }
+
+    public function searchbyIssue()
+    {
+        if(isset($_POST))
+        {
+            $admin_id = $_POST['id'];
+            $result = $this->model->searchbyIssue($admin_id);
+            if($result){
+                foreach($result as $row){
+                    $servicereqid = $row['ServiceRequestId'];
+                    $serviceid = $row['ServiceId'];
+                    $date = $row['ServiceDate'];
+                    $hour = $row['ServiceHours'];
+                    $fname = $row['FirstName'];
+                    $lname = $row['LastName'];
+                    $address_1 = $row['AddressLine1'];
+                    $address_2 = $row['AddressLine2'];
+                    $payment = $row['TotalCost'];
+                    $status = $row['Status'];
+                    $count = count($result);
+                    $stime = $row['ServiceStartTime'];
+                    $endtime = intval($stime)  + $hour;
+                    if($endtime >= 12){
+                        $pm = 1;
+                        $dummy = $endtime - 12;
+                        $var1 = intval($dummy);
+                        $min = $dummy - $var1;
+                          if($min == 0.5){
+                              $min = 30;
+                          } else{
+                              $min = 00;
+                          }
+                        
+                    } else{
+                        $pm = 0;
+                        $dummy = $endtime;
+                        $var1 = intval($dummy);
+                        $min = $dummy - $var1;
+                          if($min == 0.5){
+                              $min = 30;
+                          } else{
+                              $min = 00;
+                          }
+                    }
+
+                    if($pm == 1){
+                        $var2 = "PM";
+                    } else{
+                        $var2 = "AM";
+                    }
+
+                    if(($status == 'Pending') || ($status == 'Assigned')){
+                        $set_status = '<p class="pending">'.$status.'</p>';
+                        $action = '<a href="#" data-toggle="dropdown"><img src="./assets/image/icon-more.png"></a>
+                        <div class="dropdown-menu">
+                            <a href="#" class="dropdown-item">Edit & Reschedule</a>
+                            <a href="#" class="dropdown-item">Refund</a>
+                            <a href="#" class="dropdown-item">Cancel</a>
+                            <a href="#" class="dropdown-item">Change SP</a>
+                            <a href="#" class="dropdown-item">Escalate</a>
+                            <a href="#" class="dropdown-item">History Log</a>
+                            <a href="#" class="dropdown-item">Download Invoices</a>
+                        </div>';
+                    } else if($status == 'Completed'){
+                        $set_status = '<p class="success">Completed</p>';
+                        $action = '<a href="#" data-toggle="dropdown"><img src="./assets/image/icon-more.png"> </a>
+                        <div class="dropdown-menu">
+                            <a href="#" class="dropdown-item">Refund</a>
+                            <a href="#" class="dropdown-item">Escalate</a>
+                            <a href="#" class="dropdown-item">History Log</a>
+                            <a href="#" class="dropdown-item">Download Invoices</a>
+                        </div>';
+                    } else {
+                        $set_status = '<p class="new">'.$status.'</p>';
+                        $action = '<a href="#"><img src="./assets/image/icon-more.png"></a>';
+                    }
+
+                    $output ='<tr>
+                    <td>'.$serviceid.'</td>
+                    <td><img src="./assets/image/calendar2.png" alt=""> '.$date.' <br>
+                    <img src="./assets/image/layer-712.png" alt="clock"> '.$stime.'-'.$var1.':'.$min.' '.$var2.'
+                    </td>
+                    <td> '.$fname.' '.$lname.'  <br>
+                        <img src="./assets/image/layer-719.png" alt=""> '.$address_1.' '.$address_2.'
+                    </td>
+                    <td>
+                        
+                    </td>
+                    <td><i class="fas fa-dollar-sign"></i>'.$payment.'</td>
+                    <td>'.$set_status.'</td>
+                    <td class="text-center dropdown">'.$action.'</td>
+                  </tr>';
+
+                   echo ($output);
+                }
+            }  else{
+                $output = '<h3 class="text-center"> No records found</h3>';
+                echo $output;
+            }
+        }
+    }
+
+    public function customer()
+    {
+        if(isset($_POST))
+        {
+            $admin_id = $_POST['id'];
+            $result = $this->model->customer($admin_id);
+            echo json_encode ($result);
+        }
+    }
+
+    public function searchbycustomer()
+    {
+        if(isset($_POST))
+        {
+            $admin_id = $_POST['id'];
+            $customer = $_POST['cust'];
+            $result = $this->model->searchbycustomer($admin_id,$customer);
+            if($result){
+                foreach($result as $row){
+                    $servicereqid = $row['ServiceRequestId'];
+                    $serviceid = $row['ServiceId'];
+                    $date = $row['ServiceDate'];
+                    $hour = $row['ServiceHours'];
+                    $fname = $row['FirstName'];
+                    $lname = $row['LastName'];
+                    $address_1 = $row['AddressLine1'];
+                    $address_2 = $row['AddressLine2'];
+                    $payment = $row['TotalCost'];
+                    $status = $row['Status'];
+                    $count = count($result);
+                    $stime = $row['ServiceStartTime'];
+                    $endtime = intval($stime)  + $hour;
+                    if($endtime >= 12){
+                        $pm = 1;
+                        $dummy = $endtime - 12;
+                        $var1 = intval($dummy);
+                        $min = $dummy - $var1;
+                          if($min == 0.5){
+                              $min = 30;
+                          } else{
+                              $min = 00;
+                          }
+                        
+                    } else{
+                        $pm = 0;
+                        $dummy = $endtime;
+                        $var1 = intval($dummy);
+                        $min = $dummy - $var1;
+                          if($min == 0.5){
+                              $min = 30;
+                          } else{
+                              $min = 00;
+                          }
+                    }
+
+                    if($pm == 1){
+                        $var2 = "PM";
+                    } else{
+                        $var2 = "AM";
+                    }
+
+                    if(($status == 'Pending') || ($status == 'Assigned')){
+                        $set_status = '<p class="pending">'.$status.'</p>';
+                        $action = '<a href="#" data-toggle="dropdown"><img src="./assets/image/icon-more.png"></a>
+                        <div class="dropdown-menu">
+                            <a href="#" class="dropdown-item">Edit & Reschedule</a>
+                            <a href="#" class="dropdown-item">Refund</a>
+                            <a href="#" class="dropdown-item">Cancel</a>
+                            <a href="#" class="dropdown-item">Change SP</a>
+                            <a href="#" class="dropdown-item">Escalate</a>
+                            <a href="#" class="dropdown-item">History Log</a>
+                            <a href="#" class="dropdown-item">Download Invoices</a>
+                        </div>';
+                    } else if($status == 'Completed'){
+                        $set_status = '<p class="success">Completed</p>';
+                        $action = '<a href="#" data-toggle="dropdown"><img src="./assets/image/icon-more.png"> </a>
+                        <div class="dropdown-menu">
+                            <a href="#" class="dropdown-item">Refund</a>
+                            <a href="#" class="dropdown-item">Escalate</a>
+                            <a href="#" class="dropdown-item">History Log</a>
+                            <a href="#" class="dropdown-item">Download Invoices</a>
+                        </div>';
+                    } else {
+                        $set_status = '<p class="new">'.$status.'</p>';
+                        $action = '<a href="#"><img src="./assets/image/icon-more.png"></a>';
+                    }
+
+                    $output ='<tr>
+                    <td>'.$serviceid.'</td>
+                    <td><img src="./assets/image/calendar2.png" alt=""> '.$date.' <br>
+                    <img src="./assets/image/layer-712.png" alt="clock"> '.$stime.'-'.$var1.':'.$min.' '.$var2.'
+                    </td>
+                    <td> '.$fname.' '.$lname.'  <br>
+                        <img src="./assets/image/layer-719.png" alt=""> '.$address_1.' '.$address_2.'
+                    </td>
+                    <td>
+                        
+                    </td>
+                    <td><i class="fas fa-dollar-sign"></i>'.$payment.'</td>
+                    <td>'.$set_status.'</td>
+                    <td class="text-center dropdown">'.$action.'</td>
+                  </tr>';
+
+                   echo ($output);
+                }
+            }  else{
+                $output = '<h3 class="text-center"> No records found</h3>';
+                echo $output;
+            }
+        }
+    }
+
+    public function serviceprovider()
+    {
+        if(isset($_POST))
+        {
+            $admin_id = $_POST['id'];
+            $result = $this->model->serviceprovider($admin_id);
+            echo json_encode ($result);
+        }
+    }
+
+    public function searchbysp()
+    {
+        if(isset($_POST))
+        {
+            $admin_id = $_POST['id'];
+            $sp = $_POST['sp'];
+            $result = $this->model->searchbysp($admin_id,$sp);
+            if($result){
+                foreach($result as $row){
+                    $servicereqid = $row['ServiceRequestId'];
+                    $serviceid = $row['ServiceId'];
+                    $date = $row['ServiceDate'];
+                    $hour = $row['ServiceHours'];
+                    $fname = $row['FirstName'];
+                    $lname = $row['LastName'];
+                    $address_1 = $row['AddressLine1'];
+                    $address_2 = $row['AddressLine2'];
+                    $payment = $row['TotalCost'];
+                    $status = $row['Status'];
+                    $count = count($result);
+                    $stime = $row['ServiceStartTime'];
+                    $endtime = intval($stime)  + $hour;
+                    if($endtime >= 12){
+                        $pm = 1;
+                        $dummy = $endtime - 12;
+                        $var1 = intval($dummy);
+                        $min = $dummy - $var1;
+                          if($min == 0.5){
+                              $min = 30;
+                          } else{
+                              $min = 00;
+                          }
+                        
+                    } else{
+                        $pm = 0;
+                        $dummy = $endtime;
+                        $var1 = intval($dummy);
+                        $min = $dummy - $var1;
+                          if($min == 0.5){
+                              $min = 30;
+                          } else{
+                              $min = 00;
+                          }
+                    }
+
+                    if($pm == 1){
+                        $var2 = "PM";
+                    } else{
+                        $var2 = "AM";
+                    }
+
+                    if(($status == 'Pending') || ($status == 'Assigned')){
+                        $set_status = '<p class="pending">'.$status.'</p>';
+                        $action = '<a href="#" data-toggle="dropdown"><img src="./assets/image/icon-more.png"></a>
+                        <div class="dropdown-menu">
+                            <a href="#" class="dropdown-item">Edit & Reschedule</a>
+                            <a href="#" class="dropdown-item">Refund</a>
+                            <a href="#" class="dropdown-item">Cancel</a>
+                            <a href="#" class="dropdown-item">Change SP</a>
+                            <a href="#" class="dropdown-item">Escalate</a>
+                            <a href="#" class="dropdown-item">History Log</a>
+                            <a href="#" class="dropdown-item">Download Invoices</a>
+                        </div>';
+                    } else if($status == 'Completed'){
+                        $set_status = '<p class="success">Completed</p>';
+                        $action = '<a href="#" data-toggle="dropdown"><img src="./assets/image/icon-more.png"> </a>
+                        <div class="dropdown-menu">
+                            <a href="#" class="dropdown-item">Refund</a>
+                            <a href="#" class="dropdown-item">Escalate</a>
+                            <a href="#" class="dropdown-item">History Log</a>
+                            <a href="#" class="dropdown-item">Download Invoices</a>
+                        </div>';
+                    } else {
+                        $set_status = '<p class="new">'.$status.'</p>';
+                        $action = '<a href="#"><img src="./assets/image/icon-more.png"></a>';
+                    }
+
+                    $output ='<tr>
+                    <td>'.$serviceid.'</td>
+                    <td><img src="./assets/image/calendar2.png" alt=""> '.$date.' <br>
+                    <img src="./assets/image/layer-712.png" alt="clock"> '.$stime.'-'.$var1.':'.$min.' '.$var2.'
+                    </td>
+                    <td> '.$fname.' '.$lname.'  <br>
+                        <img src="./assets/image/layer-719.png" alt=""> '.$address_1.' '.$address_2.'
+                    </td>
+                    <td>
+                        
+                    </td>
+                    <td><i class="fas fa-dollar-sign"></i>'.$payment.'</td>
+                    <td>'.$set_status.'</td>
+                    <td class="text-center dropdown">'.$action.'</td>
+                  </tr>';
+
+                   echo ($output);
+                }
+            }  else{
+                $output = '<h3 class="text-center"> No records found</h3>';
+                echo $output;
+            }
+        }
+    }
+
+    public function editmodeldetails()
+    {
+        if(isset($_POST))
+        {
+            $sp_id = $_POST['sp_id'];
+            $result = $this->model->editmodeldetails($sp_id);
+            if($result){
+                foreach($result as $row){
+                      $servicereqid = $row['ServiceRequestId'];
+                      $date = $row['ServiceDate'];
+                      $time = $row['ServiceStartTime'];
+                      $sname = $row['AddressLine1'];
+                      $house = $row['AddressLine2'];
+                      $code = $row['zip'];
+                      $city = $row['City'];
+
+                      $array = [$servicereqid,$date,$time,$sname,$house,$code,$city];
+
+                      echo json_encode($array);
+                }
+            }
+        }
+    }
+
+    public function updateinfodetails()
+    {
+        if(isset($_POST))
+        {
+            $sp_id = $_POST['sp_id'];
+            $time = $_POST['time'];
+            $date = $_POST['date'];
+            $sname = $_POST['sname'];
+            $houseno = $_POST['houseno'];
+            $city = $_POST['city'];
+            $code = $_POST['code'];
+            $reason = $_POST['reason'];
+            $status = "Rescheduled";
+
+            $array1 = [
+               'sp_id' => $sp_id,
+               'date' => $date,
+               'time' => $time,
+               'status' => $status,
+               'reason' => $reason,
+            ];
+            $result1 = $this->model->updateinfodetails($array1);
+
+            $array2 = [
+                'sp_id' => $sp_id,
+                'sname' => $sname,
+                'houseno' => $houseno,
+                'city' => $city,
+                'code' => $code,
+            ];
+            $result2 = $this->model->insertaddress($array2);
+
+            if(($result1 == 1) || ($result2 == TRUE)){
+                echo 1;
+            } else {
+                echo 0;
+            }
+        }
+    }
+
+    public function searchbyDate()
+    {
+        if(isset($_POST))
+        {
+            $sdate = $_POST['sdate'];
+            $edate = $_POST['edate'];
+
+            $start = explode('-',$sdate);
+            $sday = $start[2];
+            $smonth = $start[1];
+            $syear = $start[0];
+
+            $end = explode('-',$edate);
+            $eday = $end[2];
+            $emonth = $end[1];
+            $eyear = $end[0];
+
+            $start_date = $sday ."/". $smonth ."/". $syear;
+            $end_date = $eday ."/". $emonth ."/". $eyear;
+
+            $result = $this->model->searchbyDate($start_date,$end_date);
+            if($result){
+                foreach($result as $row){
+                    $servicereqid = $row['ServiceRequestId'];
+                    $serviceid = $row['ServiceId'];
+                    $date = $row['ServiceDate'];
+                    $hour = $row['ServiceHours'];
+                    $fname = $row['FirstName'];
+                    $lname = $row['LastName'];
+                    $address_1 = $row['AddressLine1'];
+                    $address_2 = $row['AddressLine2'];
+                    $payment = $row['TotalCost'];
+                    $status = $row['Status'];
+                    $count = count($result);
+                    $stime = $row['ServiceStartTime'];
+                    $endtime = intval($stime)  + $hour;
+                    if($endtime >= 12){
+                        $pm = 1;
+                        $dummy = $endtime - 12;
+                        $var1 = intval($dummy);
+                        $min = $dummy - $var1;
+                          if($min == 0.5){
+                              $min = 30;
+                          } else{
+                              $min = 00;
+                          }
+                        
+                    } else{
+                        $pm = 0;
+                        $dummy = $endtime;
+                        $var1 = intval($dummy);
+                        $min = $dummy - $var1;
+                          if($min == 0.5){
+                              $min = 30;
+                          } else{
+                              $min = 00;
+                          }
+                    }
+
+                    if($pm == 1){
+                        $var2 = "PM";
+                    } else{
+                        $var2 = "AM";
+                    }
+
+                    if(($status == 'Pending') || ($status == 'Assigned')){
+                        $set_status = '<p class="pending">'.$status.'</p>';
+                        $action = '<a href="#" data-toggle="dropdown"><img src="./assets/image/icon-more.png"></a>
+                        <div class="dropdown-menu">
+                            <a href="#" class="dropdown-item">Edit & Reschedule</a>
+                            <a href="#" class="dropdown-item">Refund</a>
+                            <a href="#" class="dropdown-item">Cancel</a>
+                            <a href="#" class="dropdown-item">Change SP</a>
+                            <a href="#" class="dropdown-item">Escalate</a>
+                            <a href="#" class="dropdown-item">History Log</a>
+                            <a href="#" class="dropdown-item">Download Invoices</a>
+                        </div>';
+                    } else if($status == 'Completed'){
+                        $set_status = '<p class="success">Completed</p>';
+                        $action = '<a href="#" data-toggle="dropdown"><img src="./assets/image/icon-more.png"> </a>
+                        <div class="dropdown-menu">
+                            <a href="#" class="dropdown-item">Refund</a>
+                            <a href="#" class="dropdown-item">Escalate</a>
+                            <a href="#" class="dropdown-item">History Log</a>
+                            <a href="#" class="dropdown-item">Download Invoices</a>
+                        </div>';
+                    } else {
+                        $set_status = '<p class="new">'.$status.'</p>';
+                        $action = '<a href="#"><img src="./assets/image/icon-more.png"></a>';
+                    }
+
+                    $output ='<tr>
+                    <td>'.$serviceid.'</td>
+                    <td><img src="./assets/image/calendar2.png" alt=""> '.$date.' <br>
+                    <img src="./assets/image/layer-712.png" alt="clock"> '.$stime.'-'.$var1.':'.$min.' '.$var2.'
+                    </td>
+                    <td> '.$fname.' '.$lname.'  <br>
+                        <img src="./assets/image/layer-719.png" alt=""> '.$address_1.' '.$address_2.'
+                    </td>
+                    <td>
+                        
+                    </td>
+                    <td><i class="fas fa-dollar-sign"></i>'.$payment.'</td>
+                    <td>'.$set_status.'</td>
+                    <td class="text-center dropdown">'.$action.'</td>
+                  </tr>';
+
+                   echo ($output);
+                }
+            }  else{
+                $output = '<h3 class="text-center"> No records found</h3>';
+                echo $output;
             }
         }
     }
