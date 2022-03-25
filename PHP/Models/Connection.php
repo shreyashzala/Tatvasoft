@@ -632,6 +632,16 @@ class Helperland
             }
         }
     }
+    
+    public function serviceinfo($req_id)
+    {
+        $sql = "SELECT ServiceRequestId,servicerequest.Status,user.FirstName,user.LastName,ServiceId,ServiceDate,ServiceHours,TotalCost,ServiceStartTime,ServiceProviderId,useraddress.AddressLine1,useraddress.AddressLine2 FROM `servicerequest` JOIN user ON servicerequest.UserId = user.UserId JOIN useraddress ON servicerequest.address = useraddress.AddressId WHERE ServiceId = '$req_id'";
+        $stmt =  $this->conn->prepare($sql);
+        $stmt->execute();
+        $result  = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+
+    }
 }
 ?>
 
