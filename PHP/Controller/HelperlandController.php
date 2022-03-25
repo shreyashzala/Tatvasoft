@@ -2837,5 +2837,200 @@ class HelperlandController
             }
         }
     }
+
+    public function serviceinfo()
+    {
+        if(isset($_POST))
+        {
+            $req_id = $_POST['reqid'];
+            $result = $this->model->serviceinfo($req_id);
+            if($result){
+                foreach($result as $row){
+                    $serviceid = $row['ServiceId'];
+                    $date = $row['ServiceDate'];
+                    $hour = $row['ServiceHours'];
+                    $fname = $row['FirstName'];
+                    $lname = $row['LastName'];
+                    $address_1 = $row['AddressLine1'];
+                    $address_2 = $row['AddressLine2'];
+                    $payment = $row['TotalCost'];
+                    $sp_id  = $row['ServiceProviderId'];
+                    $stime = $row['ServiceStartTime'];
+                    $endtime = intval($stime)  + $hour;
+                    if($endtime >= 12){
+                        $pm = 1;
+                        $dummy = $endtime - 12;
+                        $var1 = intval($dummy);
+                        $min = $dummy - $var1;
+                          if($min == 0.5){
+                              $min = 30;
+                          } else{
+                              $min = 00;
+                          }
+                        
+                    } else{
+                        $pm = 0;
+                        $dummy = $endtime;
+                        $var1 = intval($dummy);
+                        $min = $dummy - $var1;
+                          if($min == 0.5){
+                              $min = 30;
+                          } else{
+                              $min = 00;
+                          }
+                    }
+
+                    if($pm == 1){
+                        $var2 = "PM";
+                    } else{
+                        $var2 = "AM";
+                    }
+                    
+                    $time = "<span>$stime-$var1:$min $var2</span>";
+
+
+                    $output = [$date,$time,$serviceid,$payment,$fname,$lname,$address_1,$address_2];
+
+                    echo json_encode($output);
+                    
+                }
+            }
+        }
+    }
+
+    public function spdate($parameter)
+    {
+        $sp_id = $parameter;
+        $result = $this->model->sp_history($sp_id);
+        if($result){
+            foreach($result as $row){
+                    $servicereqid = $row['ServiceRequestId'];
+                    $serviceid = $row['ServiceId'];
+                    $date = $row['ServiceDate'];
+                    $hour = $row['ServiceHours'];
+                    $fname = $row['FirstName'];
+                    $lname = $row['LastName'];
+                    $address_1 = $row['AddressLine1'];
+                    $address_2 = $row['AddressLine2'];
+                    $payment = $row['TotalCost'];
+                    $count = count($result);
+                    $stime = $row['ServiceStartTime'];
+                    $endtime = intval($stime)  + $hour;
+                    if($endtime >= 12){
+                        $pm = 1;
+                        $dummy = $endtime - 12;
+                        $var1 = intval($dummy);
+                        $min = $dummy - $var1;
+                          if($min == 0.5){
+                              $min = 30;
+                          } else{
+                              $min = 00;
+                          }
+                        
+                    } else{
+                        $pm = 0;
+                        $dummy = $endtime;
+                        $var1 = intval($dummy);
+                        $min = $dummy - $var1;
+                          if($min == 0.5){
+                              $min = 30;
+                          } else{
+                              $min = 00;
+                          }
+                    }
+
+                    if($pm == 1){
+                        $var2 = "PM";
+                    } else{
+                        $var2 = "AM";
+                    }
+
+                    $end = explode("/",$date);
+                    $day = $end[0];
+                    $month = $end[1];
+                    $year = $end[2];
+                    if($day < 10){
+                        $start_date = $year ."-0". $month ."-0". $day;
+                    } else {
+                        $start_date = $year ."-0". $month ."-". $day;
+                    }
+                    
+
+
+                    $resultall[] = array(
+                        'title' => 'Completed',
+                        'start' => $start_date,
+                        'id' => $serviceid,
+                    );
+            }
+        }
+        echo json_encode($resultall);
+    }
+
+    public function spalldates($parameter)
+    {
+        $sp_id = $parameter;
+        $result = $this->model->upcomingservices($sp_id);
+        if($result){
+            foreach($result as $row){
+                    $servicereqid = $row['ServiceRequestId'];
+                    $serviceid = $row['ServiceId'];
+                    $date = $row['ServiceDate'];
+                    $hour = $row['ServiceHours'];
+                    $fname = $row['FirstName'];
+                    $lname = $row['LastName'];
+                    $address_1 = $row['AddressLine1'];
+                    $address_2 = $row['AddressLine2'];
+                    $payment = $row['TotalCost'];
+                    $count = count($result);
+                    $stime = $row['ServiceStartTime'];
+                    $endtime = intval($stime)  + $hour;
+                    if($endtime >= 12){
+                        $pm = 1;
+                        $dummy = $endtime - 12;
+                        $var1 = intval($dummy);
+                        $min = $dummy - $var1;
+                          if($min == 0.5){
+                              $min = 30;
+                          } else{
+                              $min = 00;
+                          }
+                        
+                    } else{
+                        $pm = 0;
+                        $dummy = $endtime;
+                        $var1 = intval($dummy);
+                        $min = $dummy - $var1;
+                          if($min == 0.5){
+                              $min = 30;
+                          } else{
+                              $min = 00;
+                          }
+                    }
+
+                    if($pm == 1){
+                        $var2 = "PM";
+                    } else{
+                        $var2 = "AM";
+                    }
+                    $end = explode("/",$date);
+                    $day = $end[0];
+                    $month = $end[1];
+                    $year = $end[2];
+                    if($day < 10){
+                        $start_date = $year ."-0". $month ."-0". $day;
+                    } else {
+                        $start_date = $year ."-0". $month ."-". $day;
+                    }
+
+                    $resultall[] = array(
+                        'title' => 'Upcoming',
+                        'start' => $start_date,
+                        'id' => $serviceid,
+                    );
+            }
+        }
+        echo json_encode($resultall);
+    }    
 }
 
