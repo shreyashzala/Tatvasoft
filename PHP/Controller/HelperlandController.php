@@ -219,11 +219,11 @@ class HelperlandController
 
                     // with Mail
 
-                    // include("./Views/mail.php");
+                    include("./Views/mail.php");
 
                     // Without Mail
 
-                    header('Location: http://localhost/Helperland/forgotpassword' );
+                    // header('Location: http://localhost/Helperland/forgotpassword' );
 
                 } else{
                     echo '<script>
@@ -389,6 +389,7 @@ class HelperlandController
             ];
             $result = $this->model->booking($array);
             if($result){
+                include("Mails/bookingConfirmationmail.php");
                 echo ($service_id);
             } else{
                 echo ('No');
@@ -938,9 +939,12 @@ class HelperlandController
         if(isset($_POST))
         {
             $servicereqid = $_POST['servicereqid'];
+            $result = $this->model->getServiceId($servicereqid);
             $issue = $_POST['issue'];
             $rest = $this->model->cancelrequest($servicereqid,$issue);
             if($rest == 1){
+
+                include("Mails/Cancel-Request.php");
                 echo 1;
             } else{
                 echo 0;
@@ -952,11 +956,13 @@ class HelperlandController
         if(isset($_POST))
         {
             $servicereqid = $_POST['servicereqid'];
+            $result = $this->model->getServiceId($servicereqid);
             $newdate = $_POST['newdate'];
             $newtime = $_POST['newtime'];
             $rest = $this->model->reschedulerequest($servicereqid,$newdate,$newtime);
             if($rest == 1){
-                echo ($servicereqid);
+                include("Mails/Reschedule-Request.php");
+                echo ($result);
             } else{
                 echo 0;
             }
@@ -968,72 +974,156 @@ class HelperlandController
         if(isset($_POST))
         {
             $sp_id = $_POST['id'];
-            $result = $this->model->newrequest($sp_id);
-            if($result){
-                foreach($result as $row){
-                    $servicereqid = $row['ServiceRequestId'];
-                    $serviceid = $row['ServiceId'];
-                    $date = $row['ServiceDate'];
-                    $hour = $row['ServiceHours'];
-                    $fname = $row['FirstName'];
-                    $lname = $row['LastName'];
-                    $address_1 = $row['AddressLine1'];
-                    $address_2 = $row['AddressLine2'];
-                    $payment = $row['TotalCost'];
-                    $sp_id  = $row['ServiceProviderId'];
-                    $count = count($result);
-                    $stime = $row['ServiceStartTime'];
-                    $endtime = intval($stime)  + $hour;
-                    if($endtime >= 12){
-                        $pm = 1;
-                        $dummy = $endtime - 12;
-                        $var1 = intval($dummy);
-                        $min = $dummy - $var1;
-                          if($min == 0.5){
-                              $min = 30;
-                          } else{
-                              $min = 00;
-                          }
-                        
-                    } else{
-                        $pm = 0;
-                        $dummy = $endtime;
-                        $var1 = intval($dummy);
-                        $min = $dummy - $var1;
-                          if($min == 0.5){
-                              $min = 30;
-                          } else{
-                              $min = 00;
-                          }
+            $block = $this->model->block($sp_id);
+            $targetid = $block['0'];
+            $isBlock = $block['1'];
+
+                    if($isBlock == 1)
+                    {
+                        $result1 = $this->model->blockrequest($targetid);
+                        if($result1){
+                            foreach($result1 as $row){
+                                $userid = $row['UserId'];
+                                $servicereqid = $row['ServiceRequestId'];
+                                $serviceid = $row['ServiceId'];
+                                $date = $row['ServiceDate'];
+                                $hour = $row['ServiceHours'];
+                                $fname = $row['FirstName'];
+                                $lname = $row['LastName'];
+                                $address_1 = $row['AddressLine1'];
+                                $address_2 = $row['AddressLine2'];
+                                $payment = $row['TotalCost'];
+                                $sp_id  = $row['ServiceProviderId'];
+                                $count = count($result1);
+                                $stime = $row['ServiceStartTime'];
+                                $endtime = intval($stime)  + $hour;
+                                if($endtime >= 12){
+                                    $pm = 1;
+                                    $dummy = $endtime - 12;
+                                    $var1 = intval($dummy);
+                                    $min = $dummy - $var1;
+                                      if($min == 0.5){
+                                          $min = 30;
+                                      } else{
+                                          $min = 00;
+                                      }
+                                    
+                                } else{
+                                    $pm = 0;
+                                    $dummy = $endtime;
+                                    $var1 = intval($dummy);
+                                    $min = $dummy - $var1;
+                                      if($min == 0.5){
+                                          $min = 30;
+                                      } else{
+                                          $min = 00;
+                                      }
+                                }
+            
+                                if($pm == 1){
+                                    $var2 = "PM";
+                                } else{
+                                    $var2 = "AM";
+                                }
+                                
+                                
+                                 
+                                    $output ='<tr name="'.$servicereqid.'">
+                                    <td>'.$serviceid.'</td>
+                                    <td><img src="./assets/image/calendar2.png" alt=""> '.$date.'<br>
+                                    <img src="./assets/image/layer-712.png" alt="clock"> '.$stime.'-'.$var1.':'.$min.' '.$var2.'
+                                    </td>
+                                    <td>'.$fname.'&nbsp;'.$lname.' <br>
+                                        <img src="./assets/image/layer-719.png" alt=""> '.$address_1.' &nbsp; '.$address_2.'
+                                    </td>
+                                    <td><i class="fas fa-dollar-sign"></i> '.$payment.'</td>
+                                    <td class="conflict-'.$servicereqid.'"></td>
+                                    <td>
+                                    <button class="btn btn-primary open-btn" data-path="'.$date.'" style="background-color : blue !important"
+                                    data-toggle="modal" data-target="#acceptrequestmodal">Accept</button> 
+                                    <input type="hidden" id="records" value="'.$count.'">
+                                    </td>
+                                </tr>';
+                                echo ($output);
+            
+                                     
+                            }
+                        }
+                    } else
+                    {
+                        $result2 = $this->model->newrequest($sp_id);
+                        if($result2){
+                            foreach($result2 as $row){
+                                $userid = $row['UserId'];
+                                $servicereqid = $row['ServiceRequestId'];
+                                $serviceid = $row['ServiceId'];
+                                $date = $row['ServiceDate'];
+                                $hour = $row['ServiceHours'];
+                                $fname = $row['FirstName'];
+                                $lname = $row['LastName'];
+                                $address_1 = $row['AddressLine1'];
+                                $address_2 = $row['AddressLine2'];
+                                $payment = $row['TotalCost'];
+                                $sp_id  = $row['ServiceProviderId'];
+                                $count = count($result2);
+                                $stime = $row['ServiceStartTime'];
+                                $endtime = intval($stime)  + $hour;
+                                if($endtime >= 12){
+                                    $pm = 1;
+                                    $dummy = $endtime - 12;
+                                    $var1 = intval($dummy);
+                                    $min = $dummy - $var1;
+                                      if($min == 0.5){
+                                          $min = 30;
+                                      } else{
+                                          $min = 00;
+                                      }
+                                    
+                                } else{
+                                    $pm = 0;
+                                    $dummy = $endtime;
+                                    $var1 = intval($dummy);
+                                    $min = $dummy - $var1;
+                                      if($min == 0.5){
+                                          $min = 30;
+                                      } else{
+                                          $min = 00;
+                                      }
+                                }
+            
+                                if($pm == 1){
+                                    $var2 = "PM";
+                                } else{
+                                    $var2 = "AM";
+                                }
+                                
+                                
+                                 
+                                    $output2 ='<tr name="'.$servicereqid.'">
+                                    <td>'.$serviceid.'</td>
+                                    <td><img src="./assets/image/calendar2.png" alt=""> '.$date.'<br>
+                                    <img src="./assets/image/layer-712.png" alt="clock"> '.$stime.'-'.$var1.':'.$min.' '.$var2.'
+                                    </td>
+                                    <td>'.$fname.'&nbsp;'.$lname.' <br>
+                                        <img src="./assets/image/layer-719.png" alt=""> '.$address_1.' &nbsp; '.$address_2.'
+                                    </td>
+                                    <td><i class="fas fa-dollar-sign"></i> '.$payment.'</td>
+                                    <td class="conflict-'.$servicereqid.'"></td>
+                                    <td>
+                                    <button class="btn btn-primary open-btn" data-path="'.$date.'" style="background-color : blue !important"
+                                    data-toggle="modal" data-target="#acceptrequestmodal">Accept</button> 
+                                    <input type="hidden" id="records" value="'.$count.'">
+                                    </td>
+                                </tr>';
+                                 echo ($output2);
+                            }
+                        }
                     }
 
-                    if($pm == 1){
-                        $var2 = "PM";
-                    } else{
-                        $var2 = "AM";
-                    }
-                    
-
-                    $output ='<tr name="'.$servicereqid.'">
-                    <td>'.$serviceid.'</td>
-                    <td><img src="./assets/image/calendar2.png" alt=""> '.$date.'<br>
-                    <img src="./assets/image/layer-712.png" alt="clock"> '.$stime.'-'.$var1.':'.$min.' '.$var2.'
-                    </td>
-                    <td>'.$fname.'&nbsp;'.$lname.' <br>
-                        <img src="./assets/image/layer-719.png" alt=""> '.$address_1.' &nbsp; '.$address_2.'
-                    </td>
-                    <td><i class="fas fa-dollar-sign"></i> '.$payment.'</td>
-                    <td class="conflict-'.$servicereqid.'"></td>
-                    <td>
-                    <button class="btn btn-primary open-btn" data-path="'.$date.'" style="background-color : blue !important"
-                    data-toggle="modal" data-target="#acceptrequestmodal">Accept</button> 
-                    <input type="hidden" id="records" value="'.$count.'">
-                    </td>
-                </tr>';
-
-                echo ($output);
-                }
-            }
+            
+        
+            
+            
         }
     }
 
@@ -2696,6 +2786,25 @@ class HelperlandController
             $reason = $_POST['reason'];
             $status = "Rescheduled";
 
+            $result = $this->model->getServiceId($sp_id);
+        if($reason == ""){
+             
+            $array1 = [
+                'sp_id' => $sp_id,
+                'date' => $date,
+                'time' => $time,
+                'code' => $code,
+             ];
+             $result1 = $this->model->update_info_details($array1);
+            if($result1 == 1){
+                echo 1;
+            } else {
+                echo 0;
+            }
+             
+        } else{
+
+        
             $array1 = [
                'sp_id' => $sp_id,
                'date' => $date,
@@ -2704,6 +2813,7 @@ class HelperlandController
                'reason' => $reason,
             ];
             $result1 = $this->model->updateinfodetails($array1);
+            
 
             $array2 = [
                 'sp_id' => $sp_id,
@@ -2715,11 +2825,13 @@ class HelperlandController
             $result2 = $this->model->insertaddress($array2);
 
             if(($result1 == 1) || ($result2 == TRUE)){
+                include("Mails/Admin-Changes.php");
                 echo 1;
             } else {
                 echo 0;
             }
-        }
+         } 
+       }
     }
 
     public function searchbyDate()
