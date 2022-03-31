@@ -255,6 +255,21 @@ class Helperland
 
     }
 
+    public function getServiceId($servicereqid)
+    {
+        $sql = "SELECT ServiceId FROM servicerequest WHERE ServiceRequestId = '$servicereqid'";
+        $stmt =  $this->conn->prepare($sql);
+        $stmt->execute();
+        $result  = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        if($result){
+            foreach($result as $row){
+                $service_id = $row['ServiceId'];
+                return $service_id;
+            }
+        }
+
+    }
+
     public function cancelrequest($servicereqid , $issue)
     {
         $sql="UPDATE servicerequest SET Status = 'Cancelled' , HasIssue = '$issue' WHERE ServiceRequestId = '$servicereqid'";
@@ -277,13 +292,39 @@ class Helperland
 
     public function newrequest($sp_id)
     {
-        $sql = "SELECT ServiceRequestId,servicerequest.Status,user.FirstName,user.LastName,ServiceId,ServiceDate,ServiceHours,TotalCost,ServiceStartTime,ServiceProviderId,useraddress.AddressLine1,useraddress.AddressLine2 FROM `servicerequest` JOIN user ON servicerequest.UserId = user.UserId JOIN useraddress ON servicerequest.address = useraddress.AddressId WHERE servicerequest.Status = 'Pending'";
+        $sql = "SELECT ServiceRequestId,servicerequest.UserId,servicerequest.Status,user.FirstName,user.LastName,ServiceId,ServiceDate,ServiceHours,TotalCost,ServiceStartTime,ServiceProviderId,useraddress.AddressLine1,useraddress.AddressLine2 FROM `servicerequest` JOIN user ON servicerequest.UserId = user.UserId JOIN useraddress ON servicerequest.address = useraddress.AddressId WHERE servicerequest.Status = 'Pending'";
         $stmt =  $this->conn->prepare($sql);
         $stmt->execute();
         $result  = $stmt->fetchAll(PDO::FETCH_ASSOC);
         return $result;
 
     }
+
+    public function block($sp_id)
+    {
+        $sql = "SELECT UserId ,TargetUserId, IsBlocked FROM `favoriteandblocked` WHERE UserId = '$sp_id'";
+        $stmt =  $this->conn->prepare($sql);
+        $stmt->execute();
+        $result  = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        if($result){
+            foreach($result as $row){
+                $targetid = $row['TargetUserId'];
+                $isBlock = $row['IsBlocked'];
+                return array($targetid,$isBlock);
+            }
+         }
+         
+    }
+
+    public function blockrequest($targetid)
+    {
+        $sql = "SELECT ServiceRequestId,servicerequest.UserId,servicerequest.Status,user.FirstName,user.LastName,ServiceId,ServiceDate,ServiceHours,TotalCost,ServiceStartTime,ServiceProviderId,useraddress.AddressLine1,useraddress.AddressLine2 FROM `servicerequest` JOIN user ON servicerequest.UserId = user.UserId JOIN useraddress ON servicerequest.address = useraddress.AddressId LEFT JOIN `favoriteandblocked` ON servicerequest.UserId = favoriteandblocked.TargetUserId WHERE servicerequest.Status = 'Pending' AND servicerequest.UserId != '$targetid'";
+        $stmt =  $this->conn->prepare($sql);
+        $stmt->execute();
+        $result  = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $result; 
+    }
+    
 
     public function acceptrequestmodel($req_id)
     {
@@ -384,7 +425,7 @@ class Helperland
         $result  = $stmt->fetchAll(PDO::FETCH_ASSOC);
         return $result;
     } 
-
+    
     public function blockcustomer($sp_id,$userid)
     {
         $Isblock = 1;
@@ -596,6 +637,15 @@ class Helperland
         return $count;
     }
 
+    public function update_info_details($array1)
+    {
+        $sql = "UPDATE servicerequest SET `ServiceDate` = :date, `ServiceStartTime` = :time,`ZipCode` = :code  WHERE ServiceRequestId = :sp_id";
+        $stmt =  $this->conn->prepare($sql);
+        $result = $stmt->execute($array1);
+        $count = $stmt->rowCount();
+        return $count;
+    }
+
     public function insertaddress($array2)
     {
         $sql = "INSERT INTO servicerequestaddress (ServiceRequestId,AddressLine1,AddressLine2,City,PostalCode) VALUES (:sp_id,:sname,:houseno,:city,:code)";
@@ -632,7 +682,7 @@ class Helperland
             }
         }
     }
-    
+
     public function serviceinfo($req_id)
     {
         $sql = "SELECT ServiceRequestId,servicerequest.Status,user.FirstName,user.LastName,ServiceId,ServiceDate,ServiceHours,TotalCost,ServiceStartTime,ServiceProviderId,useraddress.AddressLine1,useraddress.AddressLine2 FROM `servicerequest` JOIN user ON servicerequest.UserId = user.UserId JOIN useraddress ON servicerequest.address = useraddress.AddressId WHERE ServiceId = '$req_id'";
